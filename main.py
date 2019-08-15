@@ -20,13 +20,8 @@ r.set_items(["Jessie", "Evan", "John", "Sarah", "Matt"]).\
     not_directly_before_or_after("Matt", "John").\
     not_directly_before_or_after("John", "Evan")
 
-# TODO: Move this to the class
-solutions = r.getSolutions()
+solutions = r.solve()
 print("Total number of ways: {}".format(len(solutions)))
 
 for s in solutions:
-    output = [""] * (len(developers))
-    for person, position in s.items():
-        if person in developers:
-            output[position] = person
-    print(output)
+    print(s)

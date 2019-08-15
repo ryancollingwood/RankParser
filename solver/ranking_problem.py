@@ -87,3 +87,17 @@ class RankingProblem(Problem):
         )
 
         return self
+
+    def solve(self):
+        result = []
+        solutions = self.getSolutions()
+
+        for s in solutions:
+            output = [""] * self._number_of_items
+            for person, position in s.items():
+                if person in self._items:
+                    output[position] = person
+
+            result.append(output)
+
+        return result

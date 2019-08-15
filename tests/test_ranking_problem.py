@@ -1,6 +1,7 @@
 import pytest
 from solver.ranking_problem import RankingProblem
 from solver.positions import FIRST, LAST
+from typing import List
 
 def test_can_create_ranking_problem():
     RankingProblem()
@@ -217,3 +218,17 @@ def test_is_before_constraint_set():
 
     assert(r._constraints[1][1] == ("Dog", "Cat"))
     assert(r._constraints[1][0]._func.__name__ == "is_after")
+
+
+def test_can_call_solve():
+    r = RankingProblem()
+    r.set_items(["Dog", "Cat", "Mouse"])
+    r.is_after("Dog", "Cat")
+    r.solve()
+
+
+def test_solve_returns_list():
+    r = RankingProblem()
+    r.set_items(["Dog", "Cat", "Mouse"])
+    r.is_after("Dog", "Cat")
+    assert(isinstance(r.solve(), List))
