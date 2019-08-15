@@ -154,15 +154,25 @@ def test_not_last_constraint_set():
 def test_can_call_not_directly_above_or_below():
     r = RankingProblem()
     r.set_items(["Dog", "Cat"])
-    r.not_directly_above_or_below("Dog", "Cat")
+    r.not_directly_before_or_after("Dog", "Cat")
 
 
 def test_not_directly_above_or_below_fails_on_unknown_item():
     r = RankingProblem()
     r.set_items(["Dog", "Cat"])
     with pytest.raises(ValueError, match="Kat not in Items"):
-        r.not_directly_above_or_below("Dog", "Kat")
+        r.not_directly_before_or_after("Dog", "Kat")
 
 
+def test_not_directly_above_or_below_constraint_set():
+    r = RankingProblem()
+    r.set_items(["Dog", "Cat"])
+    r.not_directly_before_or_after("Dog", "Cat")
+
+    assert(r._constraints[1][1] == ("Dog", "Cat"))
+    assert(r._constraints[1][0]._func.__name__ == "not_directly_before")
+
+    assert (r._constraints[2][1] == ("Dog", "Cat"))
+    assert (r._constraints[2][0]._func.__name__ == "not_directly_after")
 
 

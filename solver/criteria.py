@@ -28,3 +28,11 @@ def directly_before(a: int, b: int):
 def directly_after(a: int, b: int):
     distance = distance_between(a, b)
     return distance == -1
+
+
+def not_directly_before(a: int, b: int):
+    return not directly_before(a, b)
+
+
+def not_directly_after(a: int, b: int):
+    return not directly_after(a, b)

@@ -1,7 +1,7 @@
 from constraint import Problem
 from constraint import AllDifferentConstraint
 from .positions import FIRST, LAST
-from .criteria import not_equal, directly_before, directly_after
+from .criteria import not_equal, not_directly_before, not_directly_after
 
 class RankingProblem(Problem):
 
@@ -41,6 +41,16 @@ class RankingProblem(Problem):
     def not_first(self, item: str):
         self.not_equal(item, FIRST)
 
-    def not_directly_above_or_below(self, a: str, b: str):
+    def not_directly_before_or_after(self, a: str, b: str):
         self.check_item_present(a)
         self.check_item_present(b)
+
+        self.addConstraint(
+            not_directly_before,
+            (a, b)
+        )
+
+        self.addConstraint(
+            not_directly_after,
+            (a, b)
+        )
