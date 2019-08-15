@@ -19,3 +19,12 @@ def is_after(a: int, b: int):
         return False
     return not is_before(a, b)
 
+
+def directly_before(a: int, b: int):
+    distance = distance_between(a, b)
+    return distance == 1
+
+
+def directly_after(a: int, b: int):
+    distance = distance_between(a, b)
+    return distance == -1
