@@ -2,6 +2,7 @@ from constraint import Problem
 from constraint import AllDifferentConstraint
 from .positions import FIRST, LAST
 from .criteria import not_equal, not_directly_before, not_directly_after
+from .criteria import is_before, is_after
 
 class RankingProblem(Problem):
 
@@ -52,5 +53,23 @@ class RankingProblem(Problem):
 
         self.addConstraint(
             not_directly_after,
+            (a, b)
+        )
+
+    def is_before(self, a: str, b: str):
+        self.check_item_present(a)
+        self.check_item_present(b)
+
+        self.addConstraint(
+            is_before,
+            (a, b)
+        )
+
+    def is_after(self, a: str, b: str):
+        self.check_item_present(a)
+        self.check_item_present(b)
+
+        self.addConstraint(
+            is_after,
             (a, b)
         )

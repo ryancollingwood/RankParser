@@ -176,3 +176,44 @@ def test_not_directly_above_or_below_constraint_set():
     assert (r._constraints[2][0]._func.__name__ == "not_directly_after")
 
 
+def test_can_call_is_before():
+    r = RankingProblem()
+    r.set_items(["Dog", "Cat"])
+    r.is_before("Cat", "Dog")
+
+
+def test_is_before_fails_on_unknown_item():
+    r = RankingProblem()
+    r.set_items(["Dog"])
+    with pytest.raises(ValueError, match="Cat not in Items"):
+        r.is_before("Cat", "Dog")
+
+
+def test_is_before_constraint_set():
+    r = RankingProblem()
+    r.set_items(["Dog", "Cat"])
+    r.is_before("Dog", "Cat")
+
+    assert(r._constraints[1][1] == ("Dog", "Cat"))
+    assert(r._constraints[1][0]._func.__name__ == "is_before")
+
+def test_can_call_is_after():
+    r = RankingProblem()
+    r.set_items(["Dog", "Cat"])
+    r.is_after("Cat", "Dog")
+
+
+def test_is_before_fails_on_unknown_item():
+    r = RankingProblem()
+    r.set_items(["Dog"])
+    with pytest.raises(ValueError, match="Cat not in Items"):
+        r.is_after("Cat", "Dog")
+
+
+def test_is_before_constraint_set():
+    r = RankingProblem()
+    r.set_items(["Dog", "Cat"])
+    r.is_after("Dog", "Cat")
+
+    assert(r._constraints[1][1] == ("Dog", "Cat"))
+    assert(r._constraints[1][0]._func.__name__ == "is_after")
