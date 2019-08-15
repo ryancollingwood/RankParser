@@ -13,20 +13,12 @@ John is not directly below or above Evan as a developer
 
 r = RankingProblem()
 
-r.set_items(["Jessie", "Evan", "John", "Sarah", "Matt"])
-
-r.not_first("Jessie")
-
-r.not_last("Evan")
-
-r.not_first("John")
-r.not_last("John")
-
-r.is_before("Sarah", "Evan")
-
-r.not_directly_before_or_after("Matt", "John")
-
-r.not_directly_before_or_after("John", "Evan")
+r.set_items(["Jessie", "Evan", "John", "Sarah", "Matt"]).\
+    not_first("Jessie").not_last("Evan").\
+    not_first("John").not_last("John").\
+    is_before("Sarah", "Evan").\
+    not_directly_before_or_after("Matt", "John").\
+    not_directly_before_or_after("John", "Evan")
 
 # TODO: Move this to the class
 solutions = r.getSolutions()

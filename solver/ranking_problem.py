@@ -23,6 +23,8 @@ class RankingProblem(Problem):
 
         self.addVariables(self._items, range(self._number_of_items))
 
+        return self
+
     def check_item_present(self, item):
         if item not in [FIRST, LAST] + list(self._items):
             raise ValueError(f"{item} not in Items")
@@ -36,11 +38,17 @@ class RankingProblem(Problem):
             (a, b)
         )
 
+        return self
+
     def not_last(self, item: str):
         self.not_equal(item, LAST)
 
+        return self
+
     def not_first(self, item: str):
         self.not_equal(item, FIRST)
+
+        return self
 
     def not_directly_before_or_after(self, a: str, b: str):
         self.check_item_present(a)
@@ -56,6 +64,8 @@ class RankingProblem(Problem):
             (a, b)
         )
 
+        return self
+
     def is_before(self, a: str, b: str):
         self.check_item_present(a)
         self.check_item_present(b)
@@ -65,6 +75,8 @@ class RankingProblem(Problem):
             (a, b)
         )
 
+        return self
+
     def is_after(self, a: str, b: str):
         self.check_item_present(a)
         self.check_item_present(b)
@@ -73,3 +85,5 @@ class RankingProblem(Problem):
             is_after,
             (a, b)
         )
+
+        return self
