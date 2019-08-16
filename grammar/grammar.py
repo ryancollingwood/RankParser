@@ -50,3 +50,9 @@ t_PERSON = r'[A-Z]{1}[a-z]{1,}'
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
+
+
+# Tracking line numbers
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
