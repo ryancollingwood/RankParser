@@ -4,20 +4,25 @@ from solver.positions import FIRST, LAST
 
 
 def test_can_set_items():
-    test_items = ["Cat", "Dog", "Mouse"]
-    r = RankingProblem()
-    r.set_items(test_items)
+    input_items = ["Cat", "Dog", "Mouse"]
+    expected_items = ("Cat", "Dog", "Mouse",)
 
-    assert(test_items == r._items)
+    r = RankingProblem()
+    r.set_items(input_items)
+
+    assert(expected_items == r._items)
 
 
 def test_items_are_a_copy():
-    test_items = ["Cat", "Dog", "Mouse"]
-    r = RankingProblem()
-    r.set_items(test_items)
-    test_items.append("Monkey")
+    input_items = ["Cat", "Dog", "Mouse"]
+    expected_items = ("Cat", "Dog", "Mouse",)
 
-    assert(not test_items == r._items)
+    r = RankingProblem()
+    r.set_items(input_items)
+    input_items.append("Monkey")
+
+    assert(not tuple(input_items) == r._items)
+    assert(expected_items == r._items)
 
 
 def test_number_of_items_correct():

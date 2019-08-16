@@ -4,6 +4,7 @@ from .positions import FIRST, LAST
 from .criteria import not_equal, not_directly_before, not_directly_after
 from .criteria import is_before, is_after
 
+
 class RankingProblem(Problem):
 
     def __init__(self):
@@ -12,22 +13,32 @@ class RankingProblem(Problem):
         self._number_of_items = 0
         self.addVariable(FIRST, [0])
 
-    def set_items(self, items: tuple):
-        if self._items != tuple():
-            raise ValueError("Items Already Set")
-
-        self._items = items.copy()
+    def _reset_vars(self):
         self._number_of_items = len(self._items)
         self.addVariable(LAST, [self._number_of_items-1])
         self.addConstraint(AllDifferentConstraint(), self._items)
 
         self.addVariables(self._items, range(self._number_of_items))
 
+    def set_items(self, items: list):
+        if self._items != tuple():
+            raise ValueError("Items Already Set")
+
+        self._items = tuple(items.copy())
+        self._reset_vars()
+
         return self
+
+    def add_item(self, item: str):
+        if item not in self._items:
+            self.reset()
+            self._items = self._items + (item,)
+            self._reset_vars()
 
     def check_item_present(self, item):
         if item not in [FIRST, LAST] + list(self._items):
             raise ValueError(f"{item} not in Items")
+        return True
 
     def not_equal(self, a: str, b: str):
         self.check_item_present(a)
@@ -98,6 +109,7 @@ class RankingProblem(Problem):
                 if person in self._items:
                     output[position] = person
 
-            result.append(output)
+            result.append(tuple(output))
 
+        result.sort()
         return result
