@@ -27,13 +27,13 @@ def test_highlighter_highlight_doesnt_change_input():
 
 def test_highlighter_highlight_correct():
     expected_results = [
-        "[1m[36mJessie[39m[22m is [22m[91mnot[39m[22m the [1m[32mbest[39m[22m developer",
-        "[1m[36mEvan[39m[22m is [22m[91mnot[39m[22m the [1m[34mworst[39m[22m developer",
-        "[1m[36mJohn[39m[22m is [22m[91mnot[39m[22m the [1m[32mbest[39m[22m developer [22m[93mor[39m[22m the [1m[34mworst[39m[22m developer",
-        "[1m[36mSarah[39m[22m is a [22m[32mbetter[39m[22m developer than [1m[36mEvan[39m[22m",
-        "[1m[36mMatt[39m[22m is [22m[91mnot[39m[22m directly [22m[34mbelow[39m[22m [22m[93mor[39m[22m [22m[32mabove[39m[22m [1m[36mJohn[39m[22m as a developer",
-        "[1m[36mJohn[39m[22m is [22m[91mnot[39m[22m directly [22m[34mbelow[39m[22m [22m[93mor[39m[22m [22m[32mabove[39m[22m [1m[36mEvan[39m[22m as a developer",
-    ]
+        "[49m[1m[36mJessie[39m[22m[49m is [49m[22m[91mnot[39m[22m[49m the [49m[1m[32mbest[39m[22m[49m developer",
+        "[49m[1m[36mEvan[39m[22m[49m is [49m[22m[91mnot[39m[22m[49m the [49m[1m[95mworst[39m[22m[49m developer",
+        "[49m[1m[36mJohn[39m[22m[49m is [49m[22m[91mnot[39m[22m[49m the [49m[1m[32mbest[39m[22m[49m developer [49m[22m[93mor[39m[22m[49m the [49m[1m[95mworst[39m[22m[49m developer",
+        "[49m[1m[36mSarah[39m[22m[49m is a [49m[22m[32mbetter[39m[22m[49m developer than [49m[1m[36mEvan[39m[22m[49m",
+        "[49m[1m[36mMatt[39m[22m[49m is [49m[22m[91mnot[39m[22m[49m directly [49m[22m[95mbelow[39m[22m[49m [49m[22m[93mor[39m[22m[49m [49m[22m[32mabove[39m[22m[49m [49m[1m[36mJohn[39m[22m[49m as a developer",
+        "[49m[1m[36mJohn[39m[22m[49m is [49m[22m[91mnot[39m[22m[49m directly [49m[22m[95mbelow[39m[22m[49m [49m[22m[93mor[39m[22m[49m [49m[22m[32mabove[39m[22m[49m [49m[1m[36mEvan[39m[22m[49m as a developer",
+        ]
 
     hl = HighLighter(RankingLexer(), STYLE_MAP)
 

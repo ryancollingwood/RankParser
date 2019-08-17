@@ -2,7 +2,7 @@ from copy import copy
 import re
 from interactive.style_map import STYLE_MAP
 from solver import RankingLexer
-from colorama import Fore, Style
+from colorama import Fore, Back, Style
 from colorama import init as colorama_init
 from test_data import programmer_riddle
 
@@ -28,7 +28,12 @@ class HighLighter(object):
             if t.value in replacements:
                 continue
 
-            replacement = self.style_map[t.type] + t.value + Fore.RESET + Style.NORMAL
+            replacement = self.style_map[t.type] + \
+                          t.value + \
+                          Fore.RESET + \
+                          Style.NORMAL + \
+                          Back.RESET
+
             replacements[t.value] = replacement
 
         for r in replacements:

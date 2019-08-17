@@ -1,11 +1,11 @@
-from colorama import Fore, Style
+from colorama import Fore, Back, Style
 
 STYLE_MAP = {
-    "PERSON": Style.BRIGHT + Fore.CYAN,
-    "NOT": Style.NORMAL + Fore.LIGHTRED_EX,
-    "OR": Style.NORMAL + Fore.LIGHTYELLOW_EX,
-    "BETTER": Style.NORMAL + Fore.GREEN,
-    "WORSE": Style.NORMAL + Fore.BLUE,
-    "BEST": Style.BRIGHT + Fore.GREEN,
-    "WORST": Style.BRIGHT + Fore.BLUE,
+    "PERSON": Back.RESET + Style.BRIGHT + Fore.CYAN,
+    "NOT": Back.RESET + Style.NORMAL + Fore.LIGHTRED_EX,
+    "OR": Back.RESET + Style.NORMAL + Fore.LIGHTYELLOW_EX,
+    "BETTER": Back.RESET + Style.NORMAL + Fore.GREEN,
+    "WORSE": Back.RESET + Style.NORMAL + Fore.LIGHTMAGENTA_EX,
+    "BEST": Back.RESET + Style.BRIGHT + Fore.GREEN,
+    "WORST": Back.RESET + Style.BRIGHT + Fore.LIGHTMAGENTA_EX,
 }
