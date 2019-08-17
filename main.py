@@ -12,7 +12,7 @@ def solve_challenge():
         "John is not directly below or above Evan as a developer",
     ]
 
-    print("\r".join(statements))
+    print("\n".join(statements))
     print()
 
     print("Solving by specifying rules")
