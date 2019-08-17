@@ -14,11 +14,19 @@ class RankingProblem(Problem):
 
     def _reset_vars(self):
         self._number_of_items = len(self._items)
+
         self.addVariable(FIRST, [0])
         self.addVariable(LAST, [self._number_of_items-1])
-        self.addConstraint(AllDifferentConstraint(), self._items)
 
         self.addVariables(self._items, range(self._number_of_items))
+
+        # given self._items might have changed update the
+        # first constraint to consider the new set of self._items
+        # otherwise we'd be adding redundant constraints
+        if len(self._constraints) > 0:
+            self._constraints[0] = (AllDifferentConstraint(), self._items)
+        else:
+            self.addConstraint(AllDifferentConstraint(), self._items)
 
     def set_items(self, items: list):
         if self._items != tuple():
@@ -31,7 +39,10 @@ class RankingProblem(Problem):
 
     def add_item(self, item: str):
         if item not in self._items:
-            self.reset()
+            # calling self.reset will remove
+            # previously added constraints
+            # we only want to reset variables
+            self._variables.clear()
             self._items = self._items + (item,)
             self._reset_vars()
 

@@ -26,3 +26,20 @@ def test_solve_returns_sorted_list():
     r.is_after("Cat", "Dog")
     assert(isinstance(r.solve(), List))
 
+
+def test_solve_add_item_after_specifying_constraint():
+    expected_results = [
+        ("Dog", "Cat", "Mouse"),
+        ('Dog', 'Mouse', 'Cat'),
+        ("Mouse", "Dog", "Cat"),
+    ]
+
+    r = RankingProblem()
+    r.set_items(["Cat", "Dog"])
+    r.is_after("Cat", "Dog")
+    r.add_item("Mouse")
+
+    actual_results = r.solve()
+
+    assert(actual_results == expected_results)
+
