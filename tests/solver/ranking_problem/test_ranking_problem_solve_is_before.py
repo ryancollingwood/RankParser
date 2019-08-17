@@ -1,5 +1,5 @@
 from solver.ranking_problem import RankingProblem
-from solver.combinations import get_all_combintations
+from solver.combinations import get_all_combinations
 
 
 def test_solve_is_before_fully_specified_correct():
@@ -15,7 +15,7 @@ def test_solve_is_before_fully_specified_correct():
 
 
 def test_solve_is_before_fully_specified_incorrect():
-    unexpected_results = get_all_combintations(
+    unexpected_results = get_all_combinations(
         ["Mouse", "Cat", "Dog"],
         include_passed_values=False
     )

@@ -1,5 +1,5 @@
 from solver.ranking_problem import RankingProblem
-from solver.combinations import get_all_combintations
+from solver.combinations import get_all_combinations
 from typing import List
 
 
@@ -11,7 +11,7 @@ def test_can_call_solve():
 
 
 def test_solve_returns_list():
-    expected_results = get_all_combintations(["Dog", "Cat", "Mouse"])
+    expected_results = get_all_combinations(["Dog", "Cat", "Mouse"])
 
     r = RankingProblem()
     r.set_items(["Dog", "Cat", "Mouse"])

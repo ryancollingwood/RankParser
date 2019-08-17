@@ -1,15 +1,15 @@
 import pytest
-from solver.combinations import get_all_combintations
+from solver.combinations import get_all_combinations
 
 
 def test_can_call_get_all_combinations():
-    get_all_combintations(["Red", "Blue"])
+    get_all_combinations(["Red", "Blue"])
 
 
 def test_get_all_combinations_empty():
     empty_results = [()]
 
-    assert(get_all_combintations([]) == empty_results)
+    assert(get_all_combinations([]) == empty_results)
 
 
 def test_get_all_combinations_correct():
@@ -18,7 +18,7 @@ def test_get_all_combinations_correct():
         ("Red", "Blue",),
     ]
 
-    actual_results = get_all_combintations(["Red", "Blue"])
+    actual_results = get_all_combinations(["Red", "Blue"])
     assert(actual_results == expected_results)
 
 
@@ -28,7 +28,7 @@ def test_get_all_combinations_correct_but_out_of_sequence():
         ("Blue", "Red",),
     ]
 
-    actual_results = get_all_combintations(["Red", "Blue"])
+    actual_results = get_all_combinations(["Red", "Blue"])
     assert(actual_results != expected_results_out_of_sequence)
     assert(actual_results[0] == expected_results_out_of_sequence[1])
     assert (actual_results[1] == expected_results_out_of_sequence[0])
@@ -39,7 +39,7 @@ def test_get_all_combinations_excluding_supplied_correct():
         ("Blue", "Red",),
     ]
 
-    actual_results = get_all_combintations(["Red", "Blue"], False)
+    actual_results = get_all_combinations(["Red", "Blue"], False)
     assert(actual_results == expected_results)
 
 
@@ -48,7 +48,7 @@ def test_get_all_combinations_excluding_supplied_incorrect():
         ("Red", "Blue",),
     ]
 
-    actual_results = get_all_combintations(["Red", "Blue"], False)
+    actual_results = get_all_combinations(["Red", "Blue"], False)
 
     for unexpected_item in unexpected_results:
         with pytest.raises(ValueError, match=r".*is not in list"):

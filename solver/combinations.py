@@ -2,7 +2,7 @@ from itertools import permutations
 from typing import List
 
 
-def get_all_combintations(values: List, include_passed_values = True):
+def get_all_combinations(values: List, include_passed_values = True):
     result = list(permutations(values))
     result.sort()
 
