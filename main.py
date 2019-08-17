@@ -16,7 +16,7 @@ def solve_challenge():
     hl = HighLighter(rl, STYLE_MAP)
 
     print()
-    
+
     for s in programmer_riddle:
         print(hl.highlight(s))
 
@@ -91,7 +91,7 @@ def main():
 
 
 if __name__ == "__main__":
-    colorama_init(convert=True)
+    colorama_init()
 
     main()
 
