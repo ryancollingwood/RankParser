@@ -10,13 +10,13 @@ from interactive import STYLE_MAP
 from test_data import programmer_riddle
 from interactive import Session
 
-colorama_init()
-
 
 def solve_challenge():
     rl = RankingLexer()
     hl = HighLighter(rl, STYLE_MAP)
 
+    print()
+    
     for s in programmer_riddle:
         print(hl.highlight(s))
 
@@ -54,8 +54,10 @@ def typewrite_print(words):
         sys.stdout.flush()
     print("\n")
 
+
 def main_help():
-    typewrite_print(Style.BRIGHT + Fore.CYAN + "Rank Parser" + Fore.RESET + Style.NORMAL)
+    print(Style.RESET_ALL)
+    print(Style.BRIGHT + Fore.CYAN + "Rank Parser" + Fore.RESET + Style.NORMAL)
     print("Determine the order of things from textual descriptions")
     print("")
     print("Commands:")
@@ -89,6 +91,8 @@ def main():
 
 
 if __name__ == "__main__":
+    colorama_init(convert=True)
+
     main()
 
     print("")
