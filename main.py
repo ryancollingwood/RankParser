@@ -1,22 +1,28 @@
+import sys
+from time import sleep
+from colorama import Fore, Back, Style
+from colorama import init as colorama_init
 from solver import RankingProblem
 from solver import RankingParser
+from solver import RankingLexer
+from interactive import HighLighter
+from interactive import STYLE_MAP
+from test_data import programmer_riddle
+from interactive import Session
+
+colorama_init()
 
 
 def solve_challenge():
-    statements = [
-        "Jessie is not the best developer",
-        "Evan is not the worst developer",
-        "John is not the best developer or the worst developer",
-        "Sarah is a better developer than Evan",
-        "Matt is not directly below or above John as a developer",
-        "John is not directly below or above Evan as a developer",
-    ]
+    rl = RankingLexer()
+    hl = HighLighter(rl, STYLE_MAP)
 
-    print("\n".join(statements))
+    for s in programmer_riddle:
+        print(hl.highlight(s))
+
     print()
-
     print("Solving by specifying rules")
-    print("=" * 30)
+    print(Fore.CYAN + ("=" * 30) + Fore.RESET)
     r = RankingProblem()
 
     r.set_items(["Jessie", "Evan", "John", "Sarah", "Matt"]).\
@@ -29,31 +35,39 @@ def solve_challenge():
     solutions = r.solve()
 
     for s in solutions:
-        print(s)
+        typewrite_print(", ".join(s))
 
     print()
 
     print("Solving by parsing")
-    print("=" * 30)
+    print(Fore.CYAN + ("=" * 30) + Fore.RESET)
 
     rp = RankingParser()
-    print(rp.parse_statements(statements))
+    typewrite_print(", ".join(rp.parse_statements(programmer_riddle)))
 
+
+# for a bit of fun as per: https://stackoverflow.com/a/29932609/2805700
+def typewrite_print(words):
+    for char in words:
+        sleep(0.05)
+        sys.stdout.write(char)
+        sys.stdout.flush()
+    print("\n")
 
 def main_help():
-    print("Rank Parser")
+    typewrite_print(Style.BRIGHT + Fore.CYAN + "Rank Parser" + Fore.RESET + Style.NORMAL)
     print("Determine the order of things from textual descriptions")
     print("")
     print("Commands:")
-    print("\thelp - display this help text.")
-    print("\tchallenge - solve the 10x developer riddle.")
-    print("\tquery - enter query mode to specify own riddle.")
-    print("\tquit - to leave this place.")
+    print("\t" + Style.BRIGHT + "help" + Style.NORMAL + " - display this help text.")
+    print("\t" + Style.BRIGHT + "challenge" + Style.NORMAL + " - solve the 10x developer riddle.")
+    print("\t" + Style.BRIGHT + "query" + Style.NORMAL + " - enter query mode to specify own riddle.")
+    print("\t" + Style.BRIGHT + "quit" + Style.NORMAL + " - to leave this place.")
 
 
 def query():
-    rp = RankingParser()
-    rp.test()
+    session = Session()
+    session.start()
 
 
 def main():

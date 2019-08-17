@@ -45,7 +45,6 @@ class RankingLexer(object):
     t_ignore_NOISE = r'' + "".join(ignore_regexes) + "[A-Za-z\t]{1,}"
 
     def __init__(self):
-
         self.lexer = None
 
     # Define a rule so we can track line numbers
@@ -88,21 +87,6 @@ class RankingLexer(object):
                     break
                 print(tok)
             print()
-
-    def test(self):
-        self.build()
-
-        while True:
-            text = input("RankLexer> ").strip()
-            if text.lower() == "quit":
-                pass
-            self.lexer.input(text)
-            while True:
-                tok = self.lexer.token()
-                if not tok:
-                    break
-                break
-                print(tok)
 
 
 class RankingParser(object):
@@ -200,22 +184,16 @@ class RankingParser(object):
         self.parser = yacc.yacc(module=self, **kwargs)
         return self.parser
 
-    def test(self):
-        self.build()
+    def remove_last_constraint(self):
+        if len(self._rp._constraints) > 0:
+            del self._rp._constraints[-1]
+
+    def solve(self):
+        return self._rp.solve()
+
+    def parse(self, text):
         lexer = RankingLexer().build()
-
-        while True:
-            text = input("RankParser> ").strip()
-            if text.lower() == "quit":
-                break
-
-            if text != "":
-                if text == "undo":
-                    del self._rp._constraints[-1]
-                    print(self._rp.solve())
-                else:
-                    result = self.parser.parse(text, lexer=lexer)
-                    print(f"{result}")
+        return self.parser.parse(text, lexer=lexer)
 
     def parse_statements(self, statements):
         self.build()
@@ -226,17 +204,4 @@ class RankingParser(object):
             result = self.parser.parse(s, lexer=lexer)
         return result[-1][-1]
 
-
-def test_lexer():
-    lexer = RankingLexer()
-    lexer.test()
-
-
-def test_parser():
-    parser = RankingParser()
-    parser.test()
-
-
-if __name__ == "__main__":
-    test_parser()
 
