@@ -125,3 +125,5 @@ dmypy.json
 # ide specific type
 .vscode/
 .idea/
+solver/rule_lexer.out
+solver/parsetab.py
