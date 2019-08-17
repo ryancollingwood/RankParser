@@ -1,5 +1,5 @@
 from solver.ranking_problem import RankingProblem
-from solver.positions import LAST
+from solver.positions import LAST, FIRST
 
 
 def test_can_call_ranking_problem_add_item():
@@ -54,12 +54,15 @@ def test_last_varible_after_set_items():
 
     r.add_item(test_item_a)
     assert(r._variables[LAST] == [0])
+    assert(r._variables[FIRST] == [0])
 
     r.add_item(test_item_b)
     assert(r._variables[LAST] == [1])
+    assert (r._variables[FIRST] == [0])
 
     r.add_item(test_item_c)
     assert(r._variables[LAST] == [2])
+    assert (r._variables[FIRST] == [0])
 
 
 def test_ranking_problem_add_item_no_duplicates():

@@ -11,10 +11,10 @@ class RankingProblem(Problem):
         super().__init__()
         self._items = tuple()
         self._number_of_items = 0
-        self.addVariable(FIRST, [0])
 
     def _reset_vars(self):
         self._number_of_items = len(self._items)
+        self.addVariable(FIRST, [0])
         self.addVariable(LAST, [self._number_of_items-1])
         self.addConstraint(AllDifferentConstraint(), self._items)
 
