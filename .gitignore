@@ -127,3 +127,4 @@ dmypy.json
 .idea/
 solver/rule_lexer.out
 solver/parsetab.py
+interactive/highlight_out.txt
