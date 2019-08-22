@@ -17,14 +17,17 @@ class Session(object):
         self.pp = pprint.PrettyPrinter(indent=4)
 
     def do_parse(self, text):
+        print(self._hl.highlight(text))
+
         result = self._rp.parse(text)
 
         if result is not None:
             self.history.append(text)
 
-        print(self._hl.highlight(text))
-
-        self.pp.pprint(result[0])
+            if len(result) == 1:
+                self.pp.pprint(result[0])
+            elif len(result) > 1:
+                self.pp.pprint(result)
 
     def do_tokenize(self, text):
         result = self._rl.tokenize(text.strip())
