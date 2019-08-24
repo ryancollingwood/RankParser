@@ -1,5 +1,5 @@
 import pytest
-from solver.ranking_query import RankingLexer
+from solver import RankingLexer
 from ply.lex import LexToken
 
 

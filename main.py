@@ -2,9 +2,8 @@ import sys
 from time import sleep
 from colorama import Fore, Back, Style
 from colorama import init as colorama_init
-from solver import RankingProblem
+from solver import RankingProblem, RankingLexer
 from solver import RankingParser
-from solver import RankingLexer
 from interactive import HighLighter
 from interactive import STYLE_MAP
 from test_data import programmer_riddle

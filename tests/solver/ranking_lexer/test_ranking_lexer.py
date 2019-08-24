@@ -1,4 +1,4 @@
-from solver.ranking_query import RankingLexer
+from solver import RankingLexer
 
 
 def test_can_create_rule_lexer():

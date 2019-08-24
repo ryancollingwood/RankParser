@@ -1,6 +1,5 @@
 import pprint
-from solver import RankingParser
-from solver import RankingLexer
+from solver import RankingParser, RankingLexer
 from interactive import HighLighter
 from interactive import STYLE_MAP
 

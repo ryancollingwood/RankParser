@@ -1,5 +1,5 @@
 from ply.lex import Lexer
-from solver.ranking_query import RankingLexer
+from solver import RankingLexer
 
 
 def test_can_call_ranking_lexer_build():
