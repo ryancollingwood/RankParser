@@ -8,9 +8,16 @@ The tutorial was developed using Google Cloud Shell.
 ## Getting Started
 In the terminal at the bottom of the screen type: 
 
-`./go_macosx.sh`
+```
+chmod 775 ./go_macosx.sh
+./go_macosx.sh
+```
 
 This will do the following:
+- Allow us to execute the startup script
+- Execute the startup script.
+
+The startup scripts does the following: 
 - Install the virtual environment Python module.
 - Create a Python virtual environment.
 - Activate the virtual environment.
@@ -57,3 +64,12 @@ The following terms are valid for determining the placement of People:
 There are two Positions we can refer to:
 - `first`
 - `last`
+
+# Cleaning Up (Optional)
+
+Once you're done you might want to remove the RankParser application.
+You can do this be entering the following into the terminal:
+```
+cd ..
+rm -r -f RankParser/
+```
