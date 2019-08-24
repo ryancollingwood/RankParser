@@ -12,7 +12,7 @@ class RankingParser(object):
     tokens = RankingLexer.tokens
 
     def __init__(self):
-        self._rp = RankingProblem()
+        self._rank_prob = RankingProblem()
         self.parser = None
 
     # Error rule for syntax errors
@@ -49,66 +49,65 @@ class RankingParser(object):
         """
         is_before_statement : PERSON BETTER PERSON
         """
-        self._rp.add_item(p[1])
-        self._rp.add_item(p[3])
-        self._rp.is_before(p[1], p[3])
-        p[0] = self._rp.solve()
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.add_item(p[3])
+        self._rank_prob.is_before(p[1], p[3])
+        p[0] = self._rank_prob.solve()
 
     def p_is_after_statement(self, p):
         """
         is_after_statement : PERSON WORSE PERSON
         """
-        self._rp.add_item(p[1])
-        self._rp.add_item(p[3])
-        self._rp.is_after(p[1], p[3])
-        p[0] = self._rp.solve()
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.add_item(p[3])
+        self._rank_prob.is_after(p[1], p[3])
+        p[0] = self._rank_prob.solve()
 
     def p_not_first_statement(self, p):
         """
         not_first_statement : PERSON NOT BEST
         """
-        self._rp.add_item(p[1])
-        self._rp.not_first(p[1])
-        p[0] = self._rp.solve()
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.not_first(p[1])
+        p[0] = self._rank_prob.solve()
 
     def p_not_last_statement(self, p):
         """
         not_last_statement : PERSON NOT WORST
         """
-        self._rp.add_item(p[1])
-        self._rp.not_last(p[1])
-        p[0] = self._rp.solve()
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.not_last(p[1])
+        p[0] = self._rank_prob.solve()
 
     def p_not_first_or_last_statement(self, p):
         """
         not_first_or_last_statement : PERSON NOT BEST OR WORST
                                     | PERSON NOT WORST OR BEST
         """
-        self._rp.add_item(p[1])
-        self._rp.not_first(p[1])
-        self._rp.not_last(p[1])
-        p[0] = self._rp.solve()
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.not_first(p[1])
+        self._rank_prob.not_last(p[1])
+        p[0] = self._rank_prob.solve()
 
     def p_not_directly_above_or_below_statement(self, p):
         """
         not_directly_above_or_below_statement : PERSON NOT DIRECT BETTER OR WORSE PERSON
                                               | PERSON NOT DIRECT WORSE OR BETTER PERSON
         """
-        self._rp.add_item(p[1])
-        self._rp.add_item(p[7])
-        self._rp.not_directly_before_or_after(p[1], p[7])
-        p[0] = self._rp.solve()
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.add_item(p[7])
+        self._rank_prob.not_directly_before_or_after(p[1], p[7])
+        p[0] = self._rank_prob.solve()
 
     def build(self, **kwargs):
         self.parser = yacc.yacc(module=self, **kwargs)
         return self.parser
 
     def remove_last_constraint(self):
-        if len(self._rp._constraints) > 0:
-            del self._rp._constraints[-1]
+        self._rank_prob.remove_last_constraint()
 
     def solve(self):
-        return self._rp.solve()
+        return self._rank_prob.solve()
 
     def parse(self, text):
         lexer = RankingLexer().build()

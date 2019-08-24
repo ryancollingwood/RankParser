@@ -110,6 +110,15 @@ class RankingProblem(Problem):
 
         return self
 
+    def remove_last_constraint(self):
+        if len(self._constraints) > 0:
+            del self._constraints[-1]
+
+        return self
+
+    def number_of_constraints(self):
+        return len(self._constraints)
+
     def solve(self):
         result = []
         solutions = self.getSolutions()
