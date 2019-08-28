@@ -54,7 +54,7 @@ The challenge is solved both through a imperative and declarative means.
 
 The class `RankingProblem` is the imperative interface:
 <walkthrough-editor-open-file 
-    filePath="solver/ranking_problem.py"> 
+    filePath="RankParser/solver/ranking_problem.py"> 
     Open solver/ranking_problem.py
 </walkthrough-editor-open-file>
 
