@@ -8,7 +8,7 @@ The tutorial was developed using Google Cloud Shell.
 ## Getting Started
 In the terminal at the bottom of the screen type: 
 
-```
+```bash
 chmod 775 ./go_macosx.sh
 ./go_macosx.sh
 ```
@@ -32,8 +32,61 @@ Once the application is started the following commands are available to you.
 - `challenge` - Solve the 10x developer riddle.
 - `query` - Enter query mode to specify own riddles.
 - `quit` - Exit the application.
-	
+
+## Solving the challenge
+
+The challenge to solve is as follows:
+- **Jessie** is not the best developer
+- **Evan** is not the worst developer
+- **John** is not the best developer or the worst developer
+- **Sarah** is a better developer than **Evan**
+- **Matt** is not directly below or above **John** as a developer
+- **John** is not directly below or above **Evan** as a developer
+
+To see the solution to the above riddle type the following command:
+```bash
+challenge
+```
+
+## Imperative Problem Solving
+
+The challenge is solved both through a imperative and declarative means.
+
+The class `RankingProblem` is the imperative interface:
+<walkthrough-editor-open-file filePath="solver/ranking_problem.py" text="Open 'solver/ranking_problem.py'"></walkthrough-editor-open-file>
+
+This class is descendant of the `Problem` from the `python-constraints` package. To see the documentation for this class, refer to: [Python Constraints Problem API](http://labix.org/doc/constraint/public/constraint.Problem-class.html)
+
+## Declarative Problem Solving
+
+Declarative solving is achieved using the PLY (Python Lex-Yacc) module. To see a detailed overview of the module and it's usage: [PLY Overview](https://www.dabeaz.com/ply/ply.html#ply_nn2).
+
+### Lex - aka. converting text to tokens
+The first part of the declarative solving is Lexxinng. Which can be summarised as parsing input from simple human readable text into tokens that are meaningful to the program. The matching of tokens is done using regular expressions.
+To see the tokens and the regex patterns used to match them: <walkthrough-editor-open-file filePath="solver/ranking_lexer.py" text="Open 'solver/ranking_lexer.py'"></walkthrough-editor-open-file>
+
+### Yacc - aka. mapping patterns of tokens to functions
+The second part of declarative solving is once we have extracted the tokens from user input is to match token pattern to desired functions of our imperative interface. This is the 'compiling' step (although we aren't generating a binary file, which is often associated with compiling in software development). 
+
+This is achieved using doc string pattern matching on functions names starting with `p_` in the `RankingParser` class.
+To see the token patterns and how they are mapped to the imperative interface: <walkthrough-editor-open-file filePath="solver/ranking_parser.py" text="Open 'solver/ranking_parser.py'"></walkthrough-editor-open-file>.
+
+# Interactive Mode
+Given we have the means to parse simple textual descriptions into tokens and then match the tokens to a function call, it is possible to provide an interactive interface for solving ranking problems.
+
+The `Session` class wraps the aforementioned lex and yacc steps into a interface where you can type the "rules" of your own ranking problems/riddles. Along with some basic highlighting for an improved user experience.
+<walkthrough-editor-open-file filePath="interactive/session.py" text="Open 'interactive/session.py'"></walkthrough-editor-open-file>
+
+Next we'll review the syntax of defining ranking problems in the interactive mode.
+
 ## Query Syntax
+To enter query mode enter the following command:
+```bash
+query
+```
+
+The prompt will change from `>` to `RankParser>` showing you've entered query mode.
+
 If you enter query mode, you can enter your own riddles using using rank statements. These statements have a specific format that you need to follow.
 
 The general format of a rank statement is: 
