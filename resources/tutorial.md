@@ -44,7 +44,7 @@ The challenge to solve is as follows:
 - **John** is not directly below or above **Evan** as a developer
 
 To see the solution to the above riddle type the following command:
-```bash
+```
 challenge
 ```
 
@@ -81,7 +81,7 @@ Next we'll review the syntax of defining ranking problems in the interactive mod
 
 ## Query Syntax
 To enter query mode enter the following command:
-```bash
+```
 query
 ```
 
@@ -120,9 +120,14 @@ There are two Positions we can refer to:
 
 # Cleaning Up (Optional)
 
+To exit the application type in the following command:
+```
+quit
+```
+
 Once you're done you might want to remove the RankParser application.
 You can do this be entering the following into the terminal:
-```
+```bash
 cd ..
 rm -r -f RankParser/
 ```
