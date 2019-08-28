@@ -55,6 +55,8 @@ The challenge is solved both through a imperative and declarative means.
 The class `RankingProblem` is the imperative interface:
 <walkthrough-editor-open-file filePath="RankParser/solver/ranking_problem.py" text="Open 'solver/ranking_problem.py'"></walkthrough-editor-open-file>
 
+`walkthrough editor-open-file “RankParser/solver/ranking_problem.py” “Open solver/ranking_problem.py”`
+
 This class is descendant of the `Problem` from the `python-constraints` package. To see the documentation for this class, refer to: [Python Constraints Problem API](http://labix.org/doc/constraint/public/constraint.Problem-class.html)
 
 ## Declarative Problem Solving
