@@ -53,9 +53,8 @@ challenge
 The challenge is solved both through a imperative and declarative means.
 
 The class `RankingProblem` is the imperative interface:
-<walkthrough-editor-open-file filePath="RankParser/solver/ranking_problem.py" text="Open 'solver/ranking_problem.py'"></walkthrough-editor-open-file>
-
-`walkthrough editor-open-file “RankParser/solver/ranking_problem.py” “Open solver/ranking_problem.py”`
+<walkthrough-editor-open-file filePath="./solver/ranking_problem.py" text="Open solver/ranking_problem.py"></walkthrough-editor-open-file>
+`walkthrough editor-open-file "solver/ranking_problem.py" "Open solver/ranking_problem.py"`
 
 This class is descendant of the `Problem` from the `python-constraints` package. To see the documentation for this class, refer to: [Python Constraints Problem API](http://labix.org/doc/constraint/public/constraint.Problem-class.html)
 
@@ -65,19 +64,19 @@ Declarative solving is achieved using the PLY (Python Lex-Yacc) module. To see a
 
 ### Lex - aka. converting text to tokens
 The first part of the declarative solving is Lexxinng. Which can be summarised as parsing input from simple human readable text into tokens that are meaningful to the program. The matching of tokens is done using regular expressions.
-To see the tokens and the regex patterns used to match them: <walkthrough-editor-open-file filePath="RankParser/solver/ranking_lexer.py" text="Open 'solver/ranking_lexer.py'"></walkthrough-editor-open-file>
+To see the tokens and the regex patterns used to match them: <walkthrough-editor-open-file filePath="./solver/ranking_lexer.py" text="Open 'solver/ranking_lexer.py'"></walkthrough-editor-open-file>
 
 ### Yacc - aka. mapping patterns of tokens to functions
 The second part of declarative solving is once we have extracted the tokens from user input is to match token pattern to desired functions of our imperative interface. This is the 'compiling' step (although we aren't generating a binary file, which is often associated with compiling in software development). 
 
 This is achieved using doc string pattern matching on functions names starting with `p_` in the `RankingParser` class.
-To see the token patterns and how they are mapped to the imperative interface: <walkthrough-editor-open-file filePath="RankParser/solver/ranking_parser.py" text="Open 'solver/ranking_parser.py'"></walkthrough-editor-open-file>.
+To see the token patterns and how they are mapped to the imperative interface: <walkthrough-editor-open-file filePath="./solver/ranking_parser.py" text="Open 'solver/ranking_parser.py'"></walkthrough-editor-open-file>.
 
 # Interactive Mode
 Given we have the means to parse simple textual descriptions into tokens and then match the tokens to a function call, it is possible to provide an interactive interface for solving ranking problems.
 
 The `Session` class wraps the aforementioned lex and yacc steps into a interface where you can type the "rules" of your own ranking problems/riddles. Along with some basic highlighting for an improved user experience.
-<walkthrough-editor-open-file filePath="RankParser/interactive/session.py" text="Open 'interactive/session.py'"></walkthrough-editor-open-file>
+<walkthrough-editor-open-file filePath="./interactive/session.py" text="Open 'interactive/session.py'"></walkthrough-editor-open-file>
 
 Next we'll review the syntax of defining ranking problems in the interactive mode.
 
