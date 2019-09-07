@@ -15,9 +15,13 @@ class HighLighter(object):
 
     def highlight(self, text):
         result = copy(text)
-
+        tokens = None
         rl = RankingLexer()
-        tokens = rl.tokenize(text)
+
+        try:
+            tokens = rl.tokenize(text)
+        except TypeError:
+            return result
 
         replacements = dict()
 
@@ -37,24 +41,51 @@ class HighLighter(object):
             replacements[t.value] = replacement
 
         for r in replacements:
-            result = re.sub(f"\\b{r}\\b", replacements[r], result)
+            escaped_r = re.escape(r)
+            if r[0] != "[":
+                result = re.sub(f"\\b{escaped_r}\\b", replacements[r], result)
+            else:
+                result = re.sub(f"{escaped_r}", replacements[r], result)
 
         return result
 
 
-def test_highlighter():
+def test_write_out_highlighted_lines(file_name, lines):
     colorama_init()
     hl = HighLighter(RankingLexer(), STYLE_MAP)
 
     # this will create a text file of the escaped terminal
     # colour codes included too
-    with open("highlight_out.txt", "w") as f:
-        for s in programmer_riddle:
+    with open(file_name, "w") as f:
+        for s in lines:
             s_out = hl.highlight(s)
             f.write(s_out+"\n")
             print(s_out)
         f.close()
 
 
+def test_highlighter():
+    test_write_out_highlighted_lines(
+        "highlight_out.txt", programmer_riddle
+    )
+
+
+def complex_lines():
+    return [
+        "[Ryan (1)] before [(Other)]",
+        "[Sue & Julie] before [Ryan (1)]",
+        "[^Alfred^] not last",
+    ]
+
+
+def test_complex():
+
+    test_write_out_highlighted_lines(
+        "highlight_out_complex.txt", complex_lines()
+    )
+
+
 if __name__ == "__main__":
     test_highlighter()
+    test_complex()
+

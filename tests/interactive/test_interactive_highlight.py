@@ -1,6 +1,7 @@
 from copy import copy
 from interactive import HighLighter
 from interactive import STYLE_MAP
+from interactive.highlight import complex_lines
 from solver import RankingLexer
 from test_data import programmer_riddle
 
@@ -38,5 +39,18 @@ def test_highlighter_highlight_correct():
     hl = HighLighter(RankingLexer(), STYLE_MAP)
 
     for i, val in enumerate(programmer_riddle):
+        result = hl.highlight(val)
+        assert(result == expected_results[i])
+
+def test_highlighter_complex_highlight_correct():
+    expected_results = [
+        "[49m[1m[36m[Ryan (1)][39m[22m[49m [49m[22m[32mbefore[39m[22m[49m [49m[1m[36m[(Other)][39m[22m[49m",
+        "[49m[1m[36m[Sue & Julie][39m[22m[49m [49m[22m[32mbefore[39m[22m[49m [49m[1m[36m[Ryan (1)][39m[22m[49m",
+        "[49m[1m[36m[^Alfred^][39m[22m[49m [49m[22m[91mnot[39m[22m[49m [49m[1m[95mlast[39m[22m[49m",
+    ]
+
+    hl = HighLighter(RankingLexer(), STYLE_MAP)
+
+    for i, val in enumerate(complex_lines()):
         result = hl.highlight(val)
         assert(result == expected_results[i])
