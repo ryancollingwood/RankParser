@@ -143,10 +143,11 @@ class RankingParser(object):
         self.build()
         lexer = RankingLexer().build()
 
-        result = None
         for s in statements:
-            result = self.parser.parse(s, lexer=lexer)
+            self.parser.parse(s, lexer=lexer)
 
-        return result[-1][-1]
+        result = self.solve()
+
+        return result[-1]
 
 
