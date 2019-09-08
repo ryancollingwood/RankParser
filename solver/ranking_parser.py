@@ -1,3 +1,5 @@
+from typing import List
+from copy import copy
 from ply import yacc
 
 from .ranking_lexer import RankingLexer
@@ -42,6 +44,8 @@ class RankingParser(object):
                   | not_last_statement
                   | not_first_or_last_statement
                   | not_directly_above_or_below_statement
+                  | add_item_statement
+                  | remove_item_statement
         """
         p[0] = p[1]
 
@@ -52,7 +56,8 @@ class RankingParser(object):
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[3])
         self._rank_prob.is_before(p[1], p[3])
-        p[0] = self._rank_prob.solve()
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
 
     def p_is_after_statement(self, p):
         """
@@ -61,7 +66,8 @@ class RankingParser(object):
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[3])
         self._rank_prob.is_after(p[1], p[3])
-        p[0] = self._rank_prob.solve()
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
 
     def p_not_first_statement(self, p):
         """
@@ -69,7 +75,8 @@ class RankingParser(object):
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_first(p[1])
-        p[0] = self._rank_prob.solve()
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
 
     def p_not_last_statement(self, p):
         """
@@ -77,7 +84,8 @@ class RankingParser(object):
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_last(p[1])
-        p[0] = self._rank_prob.solve()
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
 
     def p_not_first_or_last_statement(self, p):
         """
@@ -87,7 +95,8 @@ class RankingParser(object):
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_first(p[1])
         self._rank_prob.not_last(p[1])
-        p[0] = self._rank_prob.solve()
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
 
     def p_not_directly_above_or_below_statement(self, p):
         """
@@ -97,7 +106,24 @@ class RankingParser(object):
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[7])
         self._rank_prob.not_directly_before_or_after(p[1], p[7])
-        p[0] = self._rank_prob.solve()
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
+
+    def p_add_item_statement(self, p):
+        """
+        add_item_statement : ADD PERSON
+        """
+        self._rank_prob.add_item(p[2])
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
+
+    def p_remove_item_statement(self, p):
+        """
+        remove_item_statement : REMOVE PERSON
+        """
+        self._rank_prob.remove_item(p[2])
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
 
     def build(self, **kwargs):
         self.parser = yacc.yacc(module=self, **kwargs)
@@ -117,9 +143,10 @@ class RankingParser(object):
         self.build()
         lexer = RankingLexer().build()
 
-        result = ""
+        result = None
         for s in statements:
             result = self.parser.parse(s, lexer=lexer)
+
         return result[-1][-1]
 
 

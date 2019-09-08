@@ -45,7 +45,7 @@ def test_item_variables_after_add_item():
     assert(r._variables[test_item_c] == [0, 1, 2])
 
 
-def test_last_varible_after_set_items():
+def test_last_variable_after_set_items():
     test_item_a = "a"
     test_item_b = "b"
     test_item_c = "c"
@@ -82,5 +82,15 @@ def test_ranking_problem_add_item_after_set_list():
     rp = RankingProblem()
     rp.set_items(["alpha", "beta", "gamma"])
     rp.add_item("delta")
+
+    assert(rp._items == expected_values)
+
+
+def test_ranking_problem_add_item_with_bracket_notation():
+    expected_values = ("alpha", "beta", "gamma", "delta_force")
+
+    rp = RankingProblem()
+    rp.set_items(["alpha", "beta", "gamma"])
+    rp.add_item("[delta force]")
 
     assert(rp._items == expected_values)

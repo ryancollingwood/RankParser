@@ -1,3 +1,4 @@
+from copy import copy
 from constraint import Problem
 from constraint import AllDifferentConstraint
 from .positions import FIRST, LAST
@@ -28,6 +29,14 @@ class RankingProblem(Problem):
         else:
             self.addConstraint(AllDifferentConstraint(), self._items)
 
+    def add_rank_constraint(self, comparison_func, *items):
+        cleaned_items = [self.clean_item(x) for x in items]
+
+        self.addConstraint(
+            comparison_func,
+            tuple(cleaned_items)
+        )
+
     def set_items(self, items: list):
         if self._items != tuple():
             raise ValueError("Items Already Set")
@@ -37,17 +46,43 @@ class RankingProblem(Problem):
 
         return self
 
+    def clean_item(self, item):
+        new_item = copy(item)
+        return new_item.replace("[", "").replace("]", "").strip().replace(" ", "_")
+
     def add_item(self, item: str):
-        if item not in self._items:
+        new_item = self.clean_item(item)
+
+        if new_item not in self._items:
             # calling self.reset will remove
             # previously added constraints
             # we only want to reset variables
             self._variables.clear()
-            self._items = self._items + (item,)
+            self._items = self._items + (new_item,)
             self._reset_vars()
 
+        return self
+
+    def remove_item(self, item: str):
+        new_item = self.clean_item(item)
+
+        if new_item in self._items:
+            new_items = list(self._items)
+            new_items.remove(new_item)
+
+            self._variables.clear()
+            if (new_items is not None) and len(new_items) > 0:
+                self._items = tuple(new_items)
+            else:
+                self._items = tuple()
+            self._reset_vars()
+
+        return self
+
     def check_item_present(self, item):
-        if item not in [FIRST, LAST] + list(self._items):
+        check_item = self.clean_item(item)
+
+        if check_item not in [FIRST, LAST] + list(self._items):
             raise ValueError(f"{item} not in Items")
         return True
 
@@ -55,9 +90,8 @@ class RankingProblem(Problem):
         self.check_item_present(a)
         self.check_item_present(b)
 
-        self.addConstraint(
-            not_equal,
-            (a, b)
+        self.add_rank_constraint(
+            not_equal, a, b
         )
 
         return self
@@ -76,14 +110,12 @@ class RankingProblem(Problem):
         self.check_item_present(a)
         self.check_item_present(b)
 
-        self.addConstraint(
-            not_directly_before,
-            (a, b)
+        self.add_rank_constraint(
+            not_directly_before, a, b
         )
 
-        self.addConstraint(
-            not_directly_after,
-            (a, b)
+        self.add_rank_constraint(
+            not_directly_after, a, b
         )
 
         return self
@@ -92,9 +124,8 @@ class RankingProblem(Problem):
         self.check_item_present(a)
         self.check_item_present(b)
 
-        self.addConstraint(
-            is_before,
-            (a, b)
+        self.add_rank_constraint(
+            is_before, a, b
         )
 
         return self
@@ -103,9 +134,8 @@ class RankingProblem(Problem):
         self.check_item_present(a)
         self.check_item_present(b)
 
-        self.addConstraint(
-            is_after,
-            (a, b)
+        self.add_rank_constraint(
+            is_after, a, b
         )
 
         return self

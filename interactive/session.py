@@ -16,32 +16,109 @@ class Session(object):
         self.pp = pprint.PrettyPrinter(indent=4)
 
     def do_parse(self, text):
+        if text.strip() == "":
+            return
+
         print(self._hl.highlight(text))
 
-        result = self._rp.parse(text)
+        try:
+            result = self._rp.parse(text)
+        except TypeError as e:
+            print(e)
+            return
 
         if result is not None:
             self.history.append(text)
 
-            if len(result) == 1:
-                self.pp.pprint(result[0])
-            elif len(result) > 1:
-                self.pp.pprint(result)
+            self.write_history()
+
+            #if len(result) == 1:
+            #    self.pp.pprint(result[0])
+            #elif len(result) > 1:
+            #    self.pp.pprint(result)
+
+    def write_history(self):
+        try:
+            file_name = "output.txt"
+
+            with open(file_name, "w") as f:
+                for l in self.history:
+                    f.write(f"{l}\n")
+        except:
+            pass
+
+    def load_history(self):
+        # TODO not hard coded file
+
+        file_name = "output.txt"
+        lines = []
+
+        with open(file_name, "r") as f:
+            lines = f.readlines()
+
+        if len(lines) == 0:
+            print(f"Nothing to read from {file_name}")
+            return
+
+        self.history.clear()
+
+        for l in lines:
+            self.do_parse(l)
+
+
+    def import_items(self):
+        # TODO not hard coded file
+
+        file_name = "import_items.txt"
+        lines = []
+
+        with open(file_name, "r") as f:
+            lines = f.readlines()
+
+        if len(lines) == 0:
+            print(f"Nothing to read from {file_name}")
+            return
+
+        for l in lines:
+            self.do_parse(f"+ [{l.strip()}]")
+
+        print("imported items")
 
     def do_tokenize(self, text):
         result = self._rl.tokenize(text.strip())
         self.pp.pprint(result)
 
+    def undo(self):
+        self._rp.remove_last_constraint()
+        print(self._rp.solve())
+
+    def print_history(self):
+        for h in self.history:
+            print(self._hl.highlight(h))
+
+    def print_token_debug(self, s):
+        self.do_tokenize(s.strip())
+
     def read_input(self, text):
-        if text == "undo":
-            self._rp.remove_last_constraint()
-            print(self._rp.solve())
+        text_split = text.split(" ")
+        if text == "=":
+            result = self._rp.solve()
+            if len(result) == 1:
+                self.pp.pprint(result[0])
+            elif len(result) > 1:
+                self.pp.pprint(result)
+
+        elif text == "undo":
+            self.undo()
         elif text == "history":
-            for h in self.history:
-                print(self._hl.highlight(h))
+            self.print_history()
+        elif text == "import_items":
+            self.import_items()
+        elif text == "load":
+            self.load_history()
         else:
             if len(text) > 2 and text[0] == "?":
-                self.do_tokenize(text[1:].strip())
+                self.print_token_debug(text[1:])
             else:
                 self.do_parse(text)
 

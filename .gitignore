@@ -128,3 +128,7 @@ dmypy.json
 solver/rule_lexer.out
 solver/parsetab.py
 interactive/highlight_out.txt
+output.txt
+import.txt
+import_items.txt
+interactive/highlight_out_complex.txt
