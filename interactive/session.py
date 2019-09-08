@@ -32,11 +32,6 @@ class Session(object):
 
             self.write_history()
 
-            #if len(result) == 1:
-            #    self.pp.pprint(result[0])
-            #elif len(result) > 1:
-            #    self.pp.pprint(result)
-
     def write_history(self):
         try:
             file_name = "output.txt"
@@ -65,12 +60,10 @@ class Session(object):
         for l in lines:
             self.do_parse(l)
 
-
     def import_items(self):
         # TODO not hard coded file
 
         file_name = "import_items.txt"
-        lines = []
 
         with open(file_name, "r") as f:
             lines = f.readlines()
@@ -101,6 +94,7 @@ class Session(object):
 
     def read_input(self, text):
         text_split = text.split(" ")
+
         if text == "=":
             result = self._rp.solve()
             if len(result) == 1:

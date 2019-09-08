@@ -1,4 +1,5 @@
 from solver import RankingParser
+from test_data import programmer_riddle
 
 
 def test_can_create_rule_parser():
@@ -21,3 +22,11 @@ def test_ranking_parser_multi_line_input():
     rp.parse(multi_line_input)
 
     assert(rp.solve() == expected_result)
+
+
+def test_ranking_parser_parse_statements():
+    expected_result = ("Sarah", "John", "Jessie", "Evan", "Matt",)
+
+    rp = RankingParser()
+    result = rp.parse_statements(programmer_riddle)
+    assert(result == expected_result)
