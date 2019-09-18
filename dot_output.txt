@@ -1,0 +1,18 @@
+strict digraph  {
+Boil_water_in_the_kettle;
+Get_a_cup_from_the_cupboard;
+Pour_boiled_water_into_cup;
+Put_tea_bag_into_cup;
+Drink_tea;
+Boil_water_in_the_kettle -> Get_a_cup_from_the_cupboard  [weight=2];
+Boil_water_in_the_kettle -> Pour_boiled_water_into_cup  [weight=2];
+Boil_water_in_the_kettle -> Put_tea_bag_into_cup  [weight=1];
+Get_a_cup_from_the_cupboard -> Pour_boiled_water_into_cup  [weight=1];
+Get_a_cup_from_the_cupboard -> Put_tea_bag_into_cup  [weight=2];
+Get_a_cup_from_the_cupboard -> Boil_water_in_the_kettle  [weight=2];
+Pour_boiled_water_into_cup -> Put_tea_bag_into_cup  [weight=2];
+Pour_boiled_water_into_cup -> Drink_tea  [weight=3];
+Put_tea_bag_into_cup -> Drink_tea  [weight=2];
+Put_tea_bag_into_cup -> Pour_boiled_water_into_cup  [weight=2];
+Put_tea_bag_into_cup -> Boil_water_in_the_kettle  [weight=1];
+}

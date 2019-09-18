@@ -60,3 +60,13 @@ class RankingNetwork(object):
             result_paths.append(all_simple_paths[i])
 
         return max_weight, result_paths
+
+    def ranking_network_to_dot_viz(self):
+        a_graph = nx.nx_pydot.to_pydot(self._G)
+        file_name = "dot_output.txt"
+
+        with open(file_name, "w") as f:
+            f.write(str(a_graph))
+
+        return a_graph
+

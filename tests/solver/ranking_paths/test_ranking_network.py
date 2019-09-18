@@ -96,3 +96,6 @@ def test_ranking_network_heaviest_path_from_ranking_graph():
     result = rn.heaviest_complete_paths("Boil_water_in_the_kettle", "Drink_tea")
 
     assert(result == expected_result)
+
+    # temp
+    rn.ranking_network_to_dot_viz()
