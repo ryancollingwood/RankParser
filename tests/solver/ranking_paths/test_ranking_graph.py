@@ -1,26 +1,4 @@
-from solver import RankingProblem
 from solver import RankingGraph
-
-def test_paths():
-    ranking_problem = RankingProblem()
-
-    ranking_problem.set_items([
-        "Boil water in the kettle",
-        "Pour boiled water into cup",
-        "Get a cup from the cupboard",
-        "Put tea bag into cup",
-        "Drink tea",
-    ])
-
-    ranking_problem.not_first("Drink tea").\
-        not_last("Boil water in the kettle").\
-        is_before("Boil water in the kettle", "Pour boiled water into cup").\
-        is_before("Get a cup from the cupboard", "Pour boiled water into cup").\
-        is_after("Put tea bag into cup", "Get a cup from the cupboard").\
-        is_before("Put tea bag into cup", "Drink tea").\
-        is_before("Pour boiled water into cup", "Drink tea")
-
-    solutions = ranking_problem.solve()
 
 
 def test_ranking_graph_can_create():
