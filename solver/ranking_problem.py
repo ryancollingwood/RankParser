@@ -41,7 +41,7 @@ class RankingProblem(Problem):
         if self._items != tuple():
             raise ValueError("Items Already Set")
 
-        self._items = tuple(items.copy())
+        self._items = tuple([self.clean_item(x) for x in items])
         self._reset_vars()
 
         return self

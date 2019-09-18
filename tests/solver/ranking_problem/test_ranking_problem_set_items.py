@@ -68,3 +68,30 @@ def test_item_variable_names_after_set_items():
 
     for key in r._variables:
         assert(key in allowed_variable_keys)
+
+
+def test_ranking_problem_set_items_bracket_notation():
+
+    test_items = [
+        "[Boil water in the kettle]",
+        "[Get a cup from the cupboard]",
+        "[Pour boiled water into cup]",
+        "[Put tea bag into cup]",
+        "[Drink tea]"
+        ]
+
+    expected_keys = [
+        "Boil_water_in_the_kettle",
+        "Get_a_cup_from_the_cupboard",
+        "Pour_boiled_water_into_cup",
+        "Put_tea_bag_into_cup",
+        "Drink_tea"
+    ]
+
+    r = RankingProblem()
+    r.set_items(test_items)
+
+    allowed_variable_keys = expected_keys + [FIRST, LAST]
+
+    for key in r._variables:
+        assert(key in allowed_variable_keys)

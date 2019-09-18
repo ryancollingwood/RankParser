@@ -6,7 +6,7 @@ from solver import RankingProblem, RankingLexer
 from solver import RankingParser
 from interactive import HighLighter
 from interactive import STYLE_MAP
-from test_data import programmer_riddle
+from test_data import programmer_riddle, tea_steps
 from interactive import Session
 
 
@@ -45,6 +45,28 @@ def solve_challenge():
     typewrite_print(", ".join(rp.parse_statements(programmer_riddle)))
 
 
+def solve_tea():
+    ranking_problem = RankingProblem()
+
+    ranking_problem.set_items([
+        "Boil water in the kettle",
+        "Pour boiled water into cup",
+        "Get a cup from the cupboard",
+        "Put tea bag into cup",
+        "Drink tea",
+    ])
+
+    ranking_problem.not_first("Drink tea").\
+        not_last("Boil water in the kettle").\
+        is_before("Boil water in the kettle", "Pour boiled water into cup").\
+        is_before("Get a cup from the cupboard", "Pour boiled water into cup").\
+        is_after("Put tea bag into cup", "Get a cup from the cupboard").\
+        is_before("Put tea bag into cup", "Drink tea").\
+        is_before("Pour boiled water into cup", "Drink tea")
+
+    solutions = ranking_problem.solve()
+    print(solutions)
+
 # for a bit of fun as per: https://stackoverflow.com/a/29932609/2805700
 def typewrite_print(words):
     for char in words:
@@ -78,6 +100,8 @@ def main():
         command = input(">").strip().lower()
         if command == "challenge":
             solve_challenge()
+        elif command == "tea":
+            solve_tea()
         elif command == "help":
             main_help()
         elif command == "query":
