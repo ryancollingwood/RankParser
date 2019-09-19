@@ -61,8 +61,36 @@ class RankingNetwork(object):
 
         return max_weight, result_paths
 
-    def ranking_network_to_dot_viz(self):
-        a_graph = nx.nx_pydot.to_pydot(self._G)
+    def ranking_network_to_dot_viz(self, hight_light_paths = None):
+        G = self._G.copy()
+
+        print("hight_light_path", hight_light_paths)
+        print("")
+
+        edges = G.edges(data=True)
+        for edge in edges:
+            data = edge[2]
+            data["penwidth"] = data["weight"]
+            del data["weight"]
+
+        print(G.edges(data=True))
+
+        nodes = G.nodes(data=True)
+        for node in nodes:
+            data = node[1]
+            data["shape"] = "rectangle"
+            data["label"] = node[0].replace("_", " ").strip()
+
+        edges = G.edges(data=True)
+        for path in hight_light_paths:
+            for i in range(len(path)-1):
+                matching_steps = [x for x in edges if x[0] == path[i] and x[1] == path[i+1]]
+                for match_edge in matching_steps:
+                   match_edge[2]["color"] = "red"
+
+        # print(G.nodes(data=True))
+
+        a_graph = nx.nx_pydot.to_pydot(G)
         file_name = "dot_output.txt"
 
         with open(file_name, "w") as f:
