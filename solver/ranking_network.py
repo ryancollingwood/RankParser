@@ -1,9 +1,12 @@
 import networkx as nx
+from .ranking_graph import RankingGraph
+from colour import Color, RGB_equivalence
 
 
 class RankingNetwork(object):
     def __init__(self, ranking_graph = None):
         self._G = nx.DiGraph()
+        self.weighted_paths = dict()
 
         if ranking_graph is not None:
             self.build_from_ranking_graph(ranking_graph)
@@ -14,12 +17,28 @@ class RankingNetwork(object):
     def nodes_names(self):
         return [x[0] for x in self._G.nodes]
 
-    def build_from_ranking_graph(self, ranking_graph):
+    def build_from_ranking_graph(self, ranking_graph: RankingGraph):
         for step in ranking_graph.edges():
             start = step[0]
             end = step[1]
             weight = ranking_graph[start][end]
             self.add_edge(start, end, weight)
+
+        nodes = self._G.nodes(data=True)
+        node_positions = ranking_graph.node_positions()
+        for node in nodes:
+            node[1]["position"] = node_positions[node[0]]
+
+        for pair in ranking_graph.start_end_nodes():
+            weighted_path_results = self.heaviest_complete_paths(pair[0], pair[1])
+            path_weight = weighted_path_results[0]
+            weighted_paths = weighted_path_results[1]
+
+            if path_weight not in self.weighted_paths:
+                self.weighted_paths[path_weight] = list()
+
+            for path in weighted_paths:
+                self.weighted_paths[path_weight].append(path)
 
     def simplest_complete_paths(self, start, end):
         G = self._G
@@ -61,8 +80,11 @@ class RankingNetwork(object):
 
         return max_weight, result_paths
 
-    def ranking_network_to_dot_viz(self, hight_light_paths = None):
+    def ranking_network_to_dot_viz(self):
         G = self._G.copy()
+
+        heaviest_path_value = max(self.weighted_paths.keys())
+        hight_light_paths = self.weighted_paths[heaviest_path_value]
 
         print("hight_light_path", hight_light_paths)
         print("")
@@ -76,10 +98,18 @@ class RankingNetwork(object):
         print(G.edges(data=True))
 
         nodes = G.nodes(data=True)
+
+        positions = set([int(x[1]["position"]) for x in nodes])
+        start_color = Color("white", equality = RGB_equivalence)
+        end_color = Color("grey", equality = RGB_equivalence)
+        color_gradient = list(start_color.range_to(end_color, max(positions)+1))
+
         for node in nodes:
             data = node[1]
             data["shape"] = "rectangle"
+            data["style"] = "filled"
             data["label"] = node[0].replace("_", " ").strip()
+            data["fillcolor"] = color_gradient[int(data["position"])].hex_l
 
         edges = G.edges(data=True)
         for path in hight_light_paths:
@@ -88,8 +118,6 @@ class RankingNetwork(object):
                 for match_edge in matching_steps:
                    match_edge[2]["color"] = "red"
 
-        # print(G.nodes(data=True))
-
         a_graph = nx.nx_pydot.to_pydot(G)
         file_name = "dot_output.txt"
 
@@ -97,4 +125,3 @@ class RankingNetwork(object):
             f.write(str(a_graph))
 
         return a_graph
-
