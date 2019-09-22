@@ -1,4 +1,4 @@
-from solver import RankingGraph
+from graph import RankingGraph
 
 
 def test_ranking_graph_can_create():

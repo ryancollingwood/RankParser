@@ -1,5 +1,5 @@
-from solver import RankingGraph
-from solver import RankingNetwork
+from graph import RankingGraph
+from graph import RankingNetwork
 
 
 def test_ranking_network_can_create():
@@ -93,9 +93,9 @@ def test_ranking_network_heaviest_path_from_ranking_graph():
         ],
     )
 
-    result = rn.heaviest_complete_paths("Boil_water_in_the_kettle", "Drink_tea")
+    result = rn.complete_paths_by_weight("Boil_water_in_the_kettle", "Drink_tea")
 
     assert(result == expected_result)
 
     # temp
-    rn.ranking_network_to_dot_viz()
+    rn.ranking_network_to_dot_viz("dot_output.txt")
