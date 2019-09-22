@@ -25,7 +25,7 @@ def digraph_to_dot_viz(
     positions = set([int(x[1]["position"]) for x in nodes])
     start = Color(start_color, equality = RGB_equivalence)
     end = Color(end_color, equality = RGB_equivalence)
-    color_gradient = list(start.range_to(end, max(positions ) +1))
+    color_gradient = list(start.range_to(end, max(positions ) +1 ))
 
     for node in nodes:
         data = node[1]

@@ -1,3 +1,3 @@
-from tests.graph.test_ranking_network import test_ranking_network_heaviest_path_from_ranking_graph
+from tests.graph.ranking_network.test_ranking_network import test_ranking_network_heaviest_path_from_ranking_graph
 
 test_ranking_network_heaviest_path_from_ranking_graph()

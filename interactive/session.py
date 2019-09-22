@@ -2,6 +2,7 @@ import pprint
 from solver import RankingParser, RankingLexer
 from interactive import HighLighter
 from interactive import STYLE_MAP
+from graph import generate_viz_from_solutions
 
 
 class Session(object):
@@ -92,6 +93,14 @@ class Session(object):
     def print_token_debug(self, s):
         self.do_tokenize(s.strip())
 
+    def generate_graph(self, filename):
+        solutions = self._rp.solve()
+        if len(solutions) == 0:
+            print("No solutions to generate a graph from")
+            return
+
+        generate_viz_from_solutions(solutions, filename)
+
     def read_input(self, text):
         text_split = text.split(" ")
 
@@ -110,6 +119,11 @@ class Session(object):
             self.import_items()
         elif text == "load":
             self.load_history()
+        elif text_split[0] in ["graph", "diagram"]:
+            if len(text_split) > 1:
+                self.generate_graph(text_split[1])
+            else:
+                print("Need to specify a filename")
         else:
             if len(text) > 2 and text[0] == "?":
                 self.print_token_debug(text[1:])
