@@ -19,7 +19,7 @@ class RankingLexer(object):
         'BETTER',
         'WORSE',
         'DIRECT',
-        'PERSON',
+        'ENTITY',
         'ADD',
         'REMOVE',
     )
@@ -36,7 +36,7 @@ class RankingLexer(object):
     t_WORSE = r'(worse|below|after)'
     t_DIRECT = r'direct(ly)?'
 
-    t_PERSON = r'([A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\])'
+    t_ENTITY = r'([A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\])'
     t_ADD = r'\+'
     t_REMOVE = r'\-'
 
@@ -44,7 +44,7 @@ class RankingLexer(object):
     # one of the specified tokens
     ignore_regexes = [f"(?!{x})" for x in [
         t_NOT, t_OR, t_BEST, t_WORST, t_BETTER, t_WORSE,
-        t_DIRECT, t_PERSON, t_ADD, t_REMOVE,
+        t_DIRECT, t_ENTITY, t_ADD, t_REMOVE,
     ]]
 
     t_ignore_NOISE = r'' + "".join(ignore_regexes) + "[A-Za-z\t]{1,}"

@@ -51,7 +51,7 @@ class RankingParser(object):
 
     def p_is_before_statement(self, p):
         """
-        is_before_statement : PERSON BETTER PERSON
+        is_before_statement : ENTITY BETTER ENTITY
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[3])
@@ -61,7 +61,7 @@ class RankingParser(object):
 
     def p_is_after_statement(self, p):
         """
-        is_after_statement : PERSON WORSE PERSON
+        is_after_statement : ENTITY WORSE ENTITY
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[3])
@@ -71,7 +71,7 @@ class RankingParser(object):
 
     def p_not_first_statement(self, p):
         """
-        not_first_statement : PERSON NOT BEST
+        not_first_statement : ENTITY NOT BEST
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_first(p[1])
@@ -80,7 +80,7 @@ class RankingParser(object):
 
     def p_not_last_statement(self, p):
         """
-        not_last_statement : PERSON NOT WORST
+        not_last_statement : ENTITY NOT WORST
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_last(p[1])
@@ -89,8 +89,8 @@ class RankingParser(object):
 
     def p_not_first_or_last_statement(self, p):
         """
-        not_first_or_last_statement : PERSON NOT BEST OR WORST
-                                    | PERSON NOT WORST OR BEST
+        not_first_or_last_statement : ENTITY NOT BEST OR WORST
+                                    | ENTITY NOT WORST OR BEST
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_first(p[1])
@@ -100,8 +100,8 @@ class RankingParser(object):
 
     def p_not_directly_above_or_below_statement(self, p):
         """
-        not_directly_above_or_below_statement : PERSON NOT DIRECT BETTER OR WORSE PERSON
-                                              | PERSON NOT DIRECT WORSE OR BETTER PERSON
+        not_directly_above_or_below_statement : ENTITY NOT DIRECT BETTER OR WORSE ENTITY
+                                              | ENTITY NOT DIRECT WORSE OR BETTER ENTITY
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[7])
@@ -111,7 +111,7 @@ class RankingParser(object):
 
     def p_add_item_statement(self, p):
         """
-        add_item_statement : ADD PERSON
+        add_item_statement : ADD ENTITY
         """
         self._rank_prob.add_item(p[2])
         # p[0] = self._rank_prob.solve()
@@ -119,7 +119,7 @@ class RankingParser(object):
 
     def p_remove_item_statement(self, p):
         """
-        remove_item_statement : REMOVE PERSON
+        remove_item_statement : REMOVE ENTITY
         """
         self._rank_prob.remove_item(p[2])
         # p[0] = self._rank_prob.solve()

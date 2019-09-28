@@ -39,7 +39,7 @@ def test_rule_lexer_tokenize_correct_tokens_single_statement():
     input_statement = "Ryan is not the worst"
 
     expected_result_types = [
-        "PERSON", "NOT", "WORST"
+        "ENTITY", "NOT", "WORST"
     ]
 
     rl = RankingLexer()

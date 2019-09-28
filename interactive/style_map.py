@@ -1,7 +1,7 @@
 from colorama import Fore, Back, Style
 
 STYLE_MAP = {
-    "PERSON": Back.RESET + Style.BRIGHT + Fore.CYAN,
+    "ENTITY": Back.RESET + Style.BRIGHT + Fore.CYAN,
     "NOT": Back.RESET + Style.NORMAL + Fore.LIGHTRED_EX,
     "OR": Back.RESET + Style.NORMAL + Fore.LIGHTYELLOW_EX,
     "BETTER": Back.RESET + Style.NORMAL + Fore.GREEN,
