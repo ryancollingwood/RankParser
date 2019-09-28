@@ -54,13 +54,32 @@ def test_ranking_parser_parse_whitespace_no_brackets():
 
 
 def test_ranking_parser_parse_whitespace_no_brackets_multiline():
-    expected_result = ("Walk_the_dog", "Feed_the_cat")
+    expected_result = [("Walk_the_dog", "Feed_the_cat")]
     rp = RankingParser()
     rp.build()
-    result = rp.parse(
-        """Walk the dog
-        Feed the cat"""
+    rp.parse(
+        """Walk the dog is not last
+        Feed the cat is not first"""
     )
+    result = rp.solve()
+    assert(result == expected_result)
+
+
+def test_ranking_parser_whitespace_partial_token_matches():
+    expected_result = ("The_orange_cat", "The_grey_cat")
+    rp = RankingParser()
+    result = rp.parse_statements([
+        "The orange cat before The grey cat",
+    ])
+    assert(result == expected_result)
+
+
+def test_ranking_parser_whitespace_partial_token_matches_missed_capital():
+    expected_result = ("The_orange_cat", "Grey_cat")
+    rp = RankingParser()
+    result = rp.parse_statements([
+        "The orange cat is before the Grey cat",
+    ])
     assert(result == expected_result)
 
 

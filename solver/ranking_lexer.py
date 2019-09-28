@@ -39,14 +39,16 @@ class RankingLexer(object):
     t_ADD = r'\+'
     t_REMOVE = r'\-'
 
-    skip_entities = "".join([f"(?!{x})" for x in [
+    # to support greedy entity accumulation create a look-ahead
+    # regex of words that cannot be part of a run on entity
+    # specification i.e. control words and article specifiers
+    skip_entities = "".join([r"(?![\b\s]"+x+r"\b)" for x in [
         t_NOT, t_OR, t_BEST, t_WORST, t_BETTER, t_WORSE,
         t_DIRECT, t_ADD, t_REMOVE, r'\n',
+        r'is', r'a', r'an', r'as'
     ]])
 
-    # ([A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\]|\b[A-Z]{1}((?!better).)+\b)
-    # t_ENTITY = r'([A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\])'
-    t_ENTITY = r'([A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\]|\b[A-Z]('+skip_entities+r'.)+\b)'
+    t_ENTITY = r'(\b[A-Z]('+skip_entities+r'.)+\b|[A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\])'
 
     # construct a lookahead regex to ignore everything that isn't
     # one of the specified tokens

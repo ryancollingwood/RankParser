@@ -48,7 +48,7 @@ class RankingParser(object):
         entity_list : ENTITY
                     | entity_list ENTITY
         """
-        p[0] = " ".join([x for x in p[1:]])
+        p[0] = " ".join([str(x).strip() for x in p[1:]])
 
     def p_statement(self, p):
         """
