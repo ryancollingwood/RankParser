@@ -30,3 +30,31 @@ def test_ranking_parser_parse_statements():
     rp = RankingParser()
     result = rp.parse_statements(programmer_riddle)
     assert(result == expected_result)
+
+
+def test_ranking_parser_parse_whitespace_in_brackets():
+    expected_result = ("Captain_Blackbeard", "Long_John_Silver")
+    rp = RankingParser()
+    result = rp.parse_statements([
+        "[Captain Blackbeard] is not last",
+        "[Long John Silver] is not first"
+    ])
+    assert(result == expected_result)
+
+
+def test_ranking_parser_parse_whitespace_no_brackets():
+    expected_result = ("Captain_Blackbeard", "Long_John_Silver")
+    rp = RankingParser()
+    result = rp.parse_statements([
+        "Captain Blackbeard is not last",
+        "Long John Silver is not first"
+    ])
+    assert(result == expected_result)
+
+
+def test_ranking_parser_parse_statements_no_statements():
+    rp = RankingParser()
+    result = rp.parse_statements([])
+
+    assert(result is None)
+

@@ -148,6 +148,9 @@ class RankingParser(object):
 
         result = self.solve()
 
+        if len(result) == 0:
+            return None
+
         return result[-1]
 
 
