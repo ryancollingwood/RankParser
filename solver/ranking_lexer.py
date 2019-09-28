@@ -22,6 +22,7 @@ class RankingLexer(object):
         'ENTITY',
         'ADD',
         'REMOVE',
+        'NEWLINE',
     )
 
     # ignore whitespace and tabs
@@ -35,16 +36,23 @@ class RankingLexer(object):
     t_BETTER = r'(better|above|before)'
     t_WORSE = r'(worse|below|after)'
     t_DIRECT = r'direct(ly)?'
-
-    t_ENTITY = r'([A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\])'
     t_ADD = r'\+'
     t_REMOVE = r'\-'
+
+    skip_entities = "".join([f"(?!{x})" for x in [
+        t_NOT, t_OR, t_BEST, t_WORST, t_BETTER, t_WORSE,
+        t_DIRECT, t_ADD, t_REMOVE, r'\n',
+    ]])
+
+    # ([A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\]|\b[A-Z]{1}((?!better).)+\b)
+    # t_ENTITY = r'([A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\])'
+    t_ENTITY = r'([A-Z]{1}[a-z]{1,}|\[[^\[]{1,}\]|\b[A-Z]('+skip_entities+r'.)+\b)'
 
     # construct a lookahead regex to ignore everything that isn't
     # one of the specified tokens
     ignore_regexes = [f"(?!{x})" for x in [
         t_NOT, t_OR, t_BEST, t_WORST, t_BETTER, t_WORSE,
-        t_DIRECT, t_ENTITY, t_ADD, t_REMOVE,
+        t_DIRECT, t_ENTITY, t_ADD, t_REMOVE, r'\n',
     ]]
 
     t_ignore_NOISE = r'' + "".join(ignore_regexes) + "[A-Za-z\t]{1,}"
@@ -53,9 +61,10 @@ class RankingLexer(object):
         self.lexer = None
 
     # Define a rule so we can track line numbers
-    def t_newline(self, t):
-        r'\n+'
+    def t_NEWLINE(self, t):
+        r'\n'
         t.lexer.lineno += len(t.value)
+        return t
 
     def t_error(self, t):
         raise TypeError("Unknown text '%s'" % (t.value,))

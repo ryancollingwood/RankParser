@@ -29,6 +29,7 @@ def test_ranking_parser_parse_statements():
 
     rp = RankingParser()
     result = rp.parse_statements(programmer_riddle)
+    print(result)
     assert(result == expected_result)
 
 
@@ -49,6 +50,17 @@ def test_ranking_parser_parse_whitespace_no_brackets():
         "Captain Blackbeard is not last",
         "Long John Silver is not first"
     ])
+    assert(result == expected_result)
+
+
+def test_ranking_parser_parse_whitespace_no_brackets_multiline():
+    expected_result = ("Walk_the_dog", "Feed_the_cat")
+    rp = RankingParser()
+    rp.build()
+    result = rp.parse(
+        """Walk the dog
+        Feed the cat"""
+    )
     assert(result == expected_result)
 
 

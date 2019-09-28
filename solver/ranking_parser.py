@@ -1,5 +1,3 @@
-from typing import List
-from copy import copy
 from ply import yacc
 
 from .ranking_lexer import RankingLexer
@@ -22,23 +20,40 @@ class RankingParser(object):
         if p is None:
             print("Syntax error in input!")
         elif "value" in dir(p):
+            if p.type == "NEWLINE":
+                return
             print("Syntax error in input!", p.value)
         else:
             print("Syntax error in input!", p)
+        pass
 
     def p_statement_list(self, p):
         """
-        statement_list : statement
+        statement_list : statement NEWLINE
+                       | statement
+                       | statement_list statement NEWLINE
                        | statement_list statement
         """
-        if len(p) == 2:
+        length_offset = 0
+        if p.slice[-1].type == 'NEWLINE':
+            length_offset = 1
+
+        if len(p) == 2 + length_offset:
             p[0] = [p[1]]
         else:
             p[0] = p[1] + [p[2]]
 
+    def p_entity_list(self, p):
+        """
+        entity_list : ENTITY
+                    | entity_list ENTITY
+        """
+        p[0] = " ".join([x for x in p[1:]])
+
     def p_statement(self, p):
         """
-        statement : is_before_statement
+        statement : entity_list
+                  | is_before_statement
                   | is_after_statement
                   | not_first_statement
                   | not_last_statement
@@ -51,7 +66,7 @@ class RankingParser(object):
 
     def p_is_before_statement(self, p):
         """
-        is_before_statement : ENTITY BETTER ENTITY
+        is_before_statement : entity_list BETTER entity_list
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[3])
@@ -61,7 +76,7 @@ class RankingParser(object):
 
     def p_is_after_statement(self, p):
         """
-        is_after_statement : ENTITY WORSE ENTITY
+        is_after_statement : entity_list WORSE entity_list
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[3])
@@ -71,7 +86,7 @@ class RankingParser(object):
 
     def p_not_first_statement(self, p):
         """
-        not_first_statement : ENTITY NOT BEST
+        not_first_statement : entity_list NOT BEST
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_first(p[1])
@@ -80,7 +95,7 @@ class RankingParser(object):
 
     def p_not_last_statement(self, p):
         """
-        not_last_statement : ENTITY NOT WORST
+        not_last_statement : entity_list NOT WORST
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_last(p[1])
@@ -89,8 +104,8 @@ class RankingParser(object):
 
     def p_not_first_or_last_statement(self, p):
         """
-        not_first_or_last_statement : ENTITY NOT BEST OR WORST
-                                    | ENTITY NOT WORST OR BEST
+        not_first_or_last_statement : entity_list NOT BEST OR WORST
+                                    | entity_list NOT WORST OR BEST
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_first(p[1])
@@ -100,8 +115,8 @@ class RankingParser(object):
 
     def p_not_directly_above_or_below_statement(self, p):
         """
-        not_directly_above_or_below_statement : ENTITY NOT DIRECT BETTER OR WORSE ENTITY
-                                              | ENTITY NOT DIRECT WORSE OR BETTER ENTITY
+        not_directly_above_or_below_statement : entity_list NOT DIRECT BETTER OR WORSE entity_list
+                                              | entity_list NOT DIRECT WORSE OR BETTER entity_list
         """
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[7])
@@ -111,7 +126,7 @@ class RankingParser(object):
 
     def p_add_item_statement(self, p):
         """
-        add_item_statement : ADD ENTITY
+        add_item_statement : ADD entity_list
         """
         self._rank_prob.add_item(p[2])
         # p[0] = self._rank_prob.solve()
@@ -119,7 +134,7 @@ class RankingParser(object):
 
     def p_remove_item_statement(self, p):
         """
-        remove_item_statement : REMOVE ENTITY
+        remove_item_statement : REMOVE entity_list
         """
         self._rank_prob.remove_item(p[2])
         # p[0] = self._rank_prob.solve()
