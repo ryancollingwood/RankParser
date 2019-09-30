@@ -5,7 +5,7 @@ from copy import copy
 class RankingGraph(object):
     def __init__(self, input_matrix = None):
 
-        self._data = dict()
+        self._weights = dict()
         self._edges = list()
         self._node_positions = defaultdict(int)
         self._start_end_nodes = list()
@@ -17,11 +17,11 @@ class RankingGraph(object):
         if item is None:
             return self
 
-        return self._data[item]
+        return self._weights[item]
 
     def _build(self, input_matrix):
+        
         for row in input_matrix:
-
             start_end_pair = (row[0], row[-1],)
             if start_end_pair not in self._start_end_nodes:
                 self._start_end_nodes.append(start_end_pair)
@@ -55,13 +55,16 @@ class RankingGraph(object):
         if edge_tuple not in self._edges:
             self._edges.append(edge_tuple)
 
-        if start not in self._data:
-            self._data[start] = defaultdict(int)
+        if start not in self._weights:
+            self._weights[start] = defaultdict(int)
 
-        self._data[start][end] += 1
+        self._weights[start][end] += 1
 
     def start_nodes(self):
-        return list(self._data.keys())
+        return list(self._weights.keys())
 
     def start_end_nodes(self):
         return self._start_end_nodes
+
+    def weights(self):
+        return self._weights

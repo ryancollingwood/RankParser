@@ -1,0 +1,16 @@
+statements = [
+    "+[Session Management]",
+    "+[Typo Correction]",
+    "+[Better support for entity recognition]",
+    "+[Project Management]",
+    "+[Generation of Graph Image]",
+    "+[Resolving insufficient specified constraints]",
+    "[Better support for entity recognition] before [Typo Correction]",
+    "[Generation of Graph Image] after [Project Management]",
+    "[Project Management] before [Session Management]",
+    "[Generation of Graph Image] before [Resolving insufficient specified constraints]",
+    "[Normalise penwidth on graph] before [Generation of Graph Image]",
+    "[Resolving insufficient specified constraints] after [Typo Correction]",
+    "[Typo Correction] not last",
+    "[Typo Correction] before [Project Management]",
+]

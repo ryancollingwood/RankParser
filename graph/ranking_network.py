@@ -85,7 +85,7 @@ class RankingNetwork(object):
         heaviest_path_value = max(self.weighted_paths.keys())
         return self.weighted_paths[heaviest_path_value]
 
-    def ranking_network_to_dot_viz(self, filename):
+    def ranking_network_to_dot_viz(self, filename, max_pen_width = 12):
         heaviest_path_value = max(self.weighted_paths.keys())
         highlight_paths = self.weighted_paths[heaviest_path_value]
 
@@ -93,4 +93,5 @@ class RankingNetwork(object):
             self._G,
             highlight_paths = highlight_paths,
             output_dot_viz = filename,
+            max_pen_width = max_pen_width,
         )
