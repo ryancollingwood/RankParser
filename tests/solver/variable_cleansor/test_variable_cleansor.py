@@ -87,3 +87,13 @@ def test_match_variable_gets_set_ratio():
     )
 
     assert(result == expected)
+
+
+def test_match_different_casings():
+    given = 'Project managmnt'
+    expected = 'Project_Management'
+    existing = ('Analysis', 'Administration', 'Project_Management')
+
+    result = match_variable(given, existing)
+    assert(result == expected)
+

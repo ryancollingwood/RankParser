@@ -11,7 +11,7 @@ def clean_variable(item: str):
 def match_variable(
         item: str,
         existing_items: Tuple,
-        tolerance: int = 95
+        tolerance: int = 90
 ):
     if len(existing_items) == 0:
         return clean_variable(item)
