@@ -4,6 +4,7 @@ from constraint import AllDifferentConstraint
 from .positions import FIRST, LAST
 from .criteria import not_equal, not_directly_before, not_directly_after
 from .criteria import is_before, is_after
+from .variable_cleansor import clean_variable, match_variable
 
 
 class RankingProblem(Problem):
@@ -30,7 +31,7 @@ class RankingProblem(Problem):
             self.addConstraint(AllDifferentConstraint(), self._items)
 
     def add_rank_constraint(self, comparison_func, *items):
-        cleaned_items = [self.clean_item(x) for x in items]
+        cleaned_items = [clean_variable(x) for x in items]
 
         self.addConstraint(
             comparison_func,
@@ -41,17 +42,13 @@ class RankingProblem(Problem):
         if self._items != tuple():
             raise ValueError("Items Already Set")
 
-        self._items = tuple([self.clean_item(x) for x in items])
+        self._items = tuple([clean_variable(x) for x in items])
         self._reset_vars()
 
         return self
 
-    def clean_item(self, item):
-        new_item = copy(item)
-        return new_item.replace("[", "").replace("]", "").strip().replace(" ", "_")
-
     def add_item(self, item: str):
-        new_item = self.clean_item(item)
+        new_item = match_variable(item, self._items)
 
         if new_item not in self._items:
             # calling self.reset will remove
@@ -64,11 +61,11 @@ class RankingProblem(Problem):
         return self
 
     def remove_item(self, item: str):
-        new_item = self.clean_item(item)
+        item_to_remove = match_variable(item, self._items)
 
-        if new_item in self._items:
+        if item_to_remove in self._items:
             new_items = list(self._items)
-            new_items.remove(new_item)
+            new_items.remove(item_to_remove)
 
             self._variables.clear()
             if (new_items is not None) and len(new_items) > 0:
@@ -80,7 +77,7 @@ class RankingProblem(Problem):
         return self
 
     def check_item_present(self, item):
-        check_item = self.clean_item(item)
+        check_item = match_variable(item, self._items)
 
         if check_item not in [FIRST, LAST] + list(self._items):
             raise ValueError(f"{item} not in Items")

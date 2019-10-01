@@ -1,5 +1,4 @@
 from solver.ranking_problem import RankingProblem
-from solver.positions import FIRST
 
 
 def test_can_create_ranking_problem():
