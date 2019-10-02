@@ -1,4 +1,8 @@
+import uuid
 import pprint
+from os import mkdir
+from shutil import move
+from os import path
 from solver import RankingParser, RankingLexer
 from interactive import HighLighter
 from interactive import STYLE_MAP
@@ -7,7 +11,9 @@ from graph import generate_viz_from_solutions
 
 class Session(object):
 
-    def __init__(self):
+    def __init__(self, session_id = None):
+        self.generated_session = True
+        self.session_id = self.set_session_id(session_id)
         self._rp = RankingParser()
         self._rl = RankingLexer()
         self.lexer = self._rl.build()
@@ -15,6 +21,23 @@ class Session(object):
         self._hl = HighLighter(self._rl, STYLE_MAP)
         self.history = list()
         self.pp = pprint.PrettyPrinter(indent=4)
+
+    def set_session_id(self, session_id):
+        if session_id is not None:
+            self.generated_session = False
+            return session_id
+        return str(uuid.uuid1())
+
+    def change_session_id(self, session_id):
+        self.generated_session = False
+
+        if not path.exists(session_id):
+            move(self.session_id, session_id)
+            self.set_session_id(session_id)
+        else:
+            self.set_session_id(session_id)
+            self.load_history(session_id)
+
 
     def do_parse(self, text):
         if text.strip() == "":
@@ -35,7 +58,8 @@ class Session(object):
 
     def write_history(self):
         try:
-            file_name = "output.txt"
+            mkdir(self.session_id)
+            file_name = f"{self.session_id}/output.txt"
 
             with open(file_name, "w") as f:
                 for l in self.history:
@@ -43,10 +67,8 @@ class Session(object):
         except:
             pass
 
-    def load_history(self):
-        # TODO not hard coded file
-
-        file_name = "output.txt"
+    def load_history(self, session_id):
+        file_name = f"{session_id}/output.txt"
         lines = []
 
         with open(file_name, "r") as f:
@@ -61,10 +83,7 @@ class Session(object):
         for l in lines:
             self.do_parse(l)
 
-    def import_items(self):
-        # TODO not hard coded file
-
-        file_name = "import_items.txt"
+    def import_items(self, file_name):
 
         with open(file_name, "r") as f:
             lines = f.readlines()
@@ -116,12 +135,18 @@ class Session(object):
         elif text == "history":
             self.print_history()
         elif text == "import_items":
-            self.import_items()
-        elif text == "load":
-            self.load_history()
+            if len(text_split) > 1:
+                self.import_items(text_split[1])
+            else:
+                print("Need to specify a filename")
+        elif text_split[0] == "load":
+            if len(text_split) > 1:
+                self.change_session_id(text_split[1])
+            else:
+                print("Need to specify a filename")
         elif text_split[0] in ["graph", "diagram"]:
             if len(text_split) > 1:
-                self.generate_graph(text_split[1])
+                self.generate_graph(f"{self.session_id}/{text_split[1]}")
             else:
                 print("Need to specify a filename")
         else:
@@ -134,7 +159,11 @@ class Session(object):
         self._rp.build()
 
         while True:
-            text = input("RankParser> ").strip()
+            prompt = "RankParser>"
+            if not self.generated_session:
+                prompt = f"{self.session_id}>"
+
+            text = input(prompt).strip()
             if text.lower() == "quit":
                 break
 
