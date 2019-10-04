@@ -1,4 +1,8 @@
+import uuid
 import pprint
+from os import mkdir
+from shutil import move
+from os import path
 from solver import RankingParser, RankingLexer
 from interactive import HighLighter
 from interactive import STYLE_MAP
@@ -7,7 +11,11 @@ from graph import generate_viz_from_solutions
 
 class Session(object):
 
-    def __init__(self):
+    def __init__(self, project_id = None, log_history = True):
+        self.generated_project = True
+        self.log_history = log_history
+        self.project_id = None
+        self.set_project_id(project_id)
         self._rp = RankingParser()
         self._rl = RankingLexer()
         self.lexer = self._rl.build()
@@ -16,7 +24,24 @@ class Session(object):
         self.history = list()
         self.pp = pprint.PrettyPrinter(indent=4)
 
-    def do_parse(self, text):
+    def set_project_id(self, project_id):
+        if project_id is not None:
+            self.generated_project = False
+            self.project_id = project_id
+        else:
+            self.project_id = str(uuid.uuid1())
+
+    def change_project_id(self, project_id):
+        self.generated_project = False
+
+        if not path.exists(project_id):
+            move(self.project_id, project_id)
+            self.set_project_id(project_id)
+        else:
+            self.set_project_id(project_id)
+            self.load_history(project_id)
+
+    def do_parse(self, text, write_history = True):
         if text.strip() == "":
             return
 
@@ -30,12 +55,18 @@ class Session(object):
 
         if result is not None:
             self.history.append(text)
-
-            self.write_history()
+            if write_history:
+                self.write_history()
 
     def write_history(self):
+        if not self.log_history:
+            return
+
         try:
-            file_name = "output.txt"
+            if not path.exists(self.project_id):
+                mkdir(self.project_id)
+
+            file_name = f"{self.project_id}/output.txt"
 
             with open(file_name, "w") as f:
                 for l in self.history:
@@ -43,10 +74,8 @@ class Session(object):
         except:
             pass
 
-    def load_history(self):
-        # TODO not hard coded file
-
-        file_name = "output.txt"
+    def load_history(self, project_id):
+        file_name = f"{project_id}/output.txt"
         lines = []
 
         with open(file_name, "r") as f:
@@ -59,12 +88,9 @@ class Session(object):
         self.history.clear()
 
         for l in lines:
-            self.do_parse(l)
+            self.do_parse(l, write_history= False)
 
-    def import_items(self):
-        # TODO not hard coded file
-
-        file_name = "import_items.txt"
+    def import_items(self, file_name):
 
         with open(file_name, "r") as f:
             lines = f.readlines()
@@ -116,12 +142,18 @@ class Session(object):
         elif text == "history":
             self.print_history()
         elif text == "import_items":
-            self.import_items()
-        elif text == "load":
-            self.load_history()
+            if len(text_split) > 1:
+                self.import_items(text_split[1])
+            else:
+                print("Need to specify a filename")
+        elif text_split[0] == "load":
+            if len(text_split) > 1:
+                self.change_project_id(text_split[1])
+            else:
+                print("Need to specify a filename")
         elif text_split[0] in ["graph", "diagram"]:
             if len(text_split) > 1:
-                self.generate_graph(text_split[1])
+                self.generate_graph(f"{self.project_id}/{text_split[1]}")
             else:
                 print("Need to specify a filename")
         else:
@@ -134,7 +166,11 @@ class Session(object):
         self._rp.build()
 
         while True:
-            text = input("RankParser> ").strip()
+            prompt = "RankParser>"
+            if not self.generated_project:
+                prompt = f"{self.project_id}>"
+
+            text = input(prompt).strip()
             if text.lower() == "quit":
                 break
 
