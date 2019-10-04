@@ -125,10 +125,15 @@ dmypy.json
 # ide specific type
 .vscode/
 .idea/
+
+# intermediate output files
 solver/rule_lexer.out
 solver/parsetab.py
-interactive/highlight_out.txt
 output.txt
 import.txt
 import_items.txt
 interactive/highlight_out_complex.txt
+interactive/highlight_out.txt
+
+# dependencies
+graphviz-238/
