@@ -11,8 +11,9 @@ from graph import generate_viz_from_solutions
 
 class Session(object):
 
-    def __init__(self, project_id = None):
+    def __init__(self, project_id = None, log_history = True):
         self.generated_project = True
+        self.log_history = log_history
         self.project_id = None
         self.set_project_id(project_id)
         self._rp = RankingParser()
@@ -58,6 +59,9 @@ class Session(object):
                 self.write_history()
 
     def write_history(self):
+        if not self.log_history:
+            return
+
         try:
             if not path.exists(self.project_id):
                 mkdir(self.project_id)
