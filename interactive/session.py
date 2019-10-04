@@ -11,9 +11,10 @@ from graph import generate_viz_from_solutions
 
 class Session(object):
 
-    def __init__(self, session_id = None):
-        self.generated_session = True
-        self.session_id = self.set_session_id(session_id)
+    def __init__(self, project_id = None):
+        self.generated_project = True
+        self.project_id = None
+        self.set_project_id(project_id)
         self._rp = RankingParser()
         self._rl = RankingLexer()
         self.lexer = self._rl.build()
@@ -22,24 +23,24 @@ class Session(object):
         self.history = list()
         self.pp = pprint.PrettyPrinter(indent=4)
 
-    def set_session_id(self, session_id):
-        if session_id is not None:
-            self.generated_session = False
-            return session_id
-        return str(uuid.uuid1())
-
-    def change_session_id(self, session_id):
-        self.generated_session = False
-
-        if not path.exists(session_id):
-            move(self.session_id, session_id)
-            self.set_session_id(session_id)
+    def set_project_id(self, project_id):
+        if project_id is not None:
+            self.generated_project = False
+            self.project_id = project_id
         else:
-            self.set_session_id(session_id)
-            self.load_history(session_id)
+            self.project_id = str(uuid.uuid1())
 
+    def change_project_id(self, project_id):
+        self.generated_project = False
 
-    def do_parse(self, text):
+        if not path.exists(project_id):
+            move(self.project_id, project_id)
+            self.set_project_id(project_id)
+        else:
+            self.set_project_id(project_id)
+            self.load_history(project_id)
+
+    def do_parse(self, text, write_history = True):
         if text.strip() == "":
             return
 
@@ -53,13 +54,15 @@ class Session(object):
 
         if result is not None:
             self.history.append(text)
-
-            self.write_history()
+            if write_history:
+                self.write_history()
 
     def write_history(self):
         try:
-            mkdir(self.session_id)
-            file_name = f"{self.session_id}/output.txt"
+            if not path.exists(self.project_id):
+                mkdir(self.project_id)
+
+            file_name = f"{self.project_id}/output.txt"
 
             with open(file_name, "w") as f:
                 for l in self.history:
@@ -67,8 +70,8 @@ class Session(object):
         except:
             pass
 
-    def load_history(self, session_id):
-        file_name = f"{session_id}/output.txt"
+    def load_history(self, project_id):
+        file_name = f"{project_id}/output.txt"
         lines = []
 
         with open(file_name, "r") as f:
@@ -81,7 +84,7 @@ class Session(object):
         self.history.clear()
 
         for l in lines:
-            self.do_parse(l)
+            self.do_parse(l, write_history= False)
 
     def import_items(self, file_name):
 
@@ -141,12 +144,12 @@ class Session(object):
                 print("Need to specify a filename")
         elif text_split[0] == "load":
             if len(text_split) > 1:
-                self.change_session_id(text_split[1])
+                self.change_project_id(text_split[1])
             else:
                 print("Need to specify a filename")
         elif text_split[0] in ["graph", "diagram"]:
             if len(text_split) > 1:
-                self.generate_graph(f"{self.session_id}/{text_split[1]}")
+                self.generate_graph(f"{self.project_id}/{text_split[1]}")
             else:
                 print("Need to specify a filename")
         else:
@@ -160,8 +163,8 @@ class Session(object):
 
         while True:
             prompt = "RankParser>"
-            if not self.generated_session:
-                prompt = f"{self.session_id}>"
+            if not self.generated_project:
+                prompt = f"{self.project_id}>"
 
             text = input(prompt).strip()
             if text.lower() == "quit":
