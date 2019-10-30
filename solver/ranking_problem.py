@@ -31,7 +31,7 @@ class RankingProblem(Problem):
             self.addConstraint(AllDifferentConstraint(), self._items)
 
     def add_rank_constraint(self, comparison_func, *items):
-        cleaned_items = [clean_variable(x) for x in items]
+        cleaned_items = [match_variable(x, self._items) for x in items]
 
         self.addConstraint(
             comparison_func,
