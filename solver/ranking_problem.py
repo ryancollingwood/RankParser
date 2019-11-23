@@ -2,9 +2,10 @@ from copy import copy
 from constraint import Problem
 from constraint import AllDifferentConstraint
 from .positions import FIRST, LAST
-from .criteria import not_equal, not_directly_before, not_directly_after
+from .criteria import is_equal, not_equal
+from .criteria import not_directly_before, not_directly_after
 from .criteria import is_before, is_after
-from .variable_cleansor import clean_variable, match_variable
+from .variable_cleansor import clean_variable, fuzzy_match_variable
 
 
 class RankingProblem(Problem):
@@ -31,7 +32,7 @@ class RankingProblem(Problem):
             self.addConstraint(AllDifferentConstraint(), self._items)
 
     def add_rank_constraint(self, comparison_func, *items):
-        cleaned_items = [match_variable(x, self._items) for x in items]
+        cleaned_items = [self.match_variable(x) for x in items]
 
         self.addConstraint(
             comparison_func,
@@ -47,8 +48,13 @@ class RankingProblem(Problem):
 
         return self
 
+    def match_variable(self, item: str):
+        if item not in [FIRST, LAST]:
+            return fuzzy_match_variable(item, self._items)
+        return item
+
     def add_item(self, item: str):
-        new_item = match_variable(item, self._items)
+        new_item = self.match_variable(item)
 
         if new_item not in self._items:
             # calling self.reset will remove
@@ -61,7 +67,7 @@ class RankingProblem(Problem):
         return self
 
     def remove_item(self, item: str):
-        item_to_remove = match_variable(item, self._items)
+        item_to_remove = self.match_variable(item)
 
         if item_to_remove in self._items:
             new_items = list(self._items)
@@ -77,7 +83,7 @@ class RankingProblem(Problem):
         return self
 
     def check_item_present(self, item):
-        check_item = match_variable(item, self._items)
+        check_item = self.match_variable(item)
 
         if check_item not in [FIRST, LAST] + list(self._items):
             raise ValueError(f"{item} not in Items")
@@ -93,13 +99,33 @@ class RankingProblem(Problem):
 
         return self
 
+    def is_equal(self, a: str, b: str):
+        self.check_item_present(a)
+        self.check_item_present(b)
+
+        self.add_rank_constraint(
+            is_equal, a, b
+        )
+
+        return self
+
     def not_last(self, item: str):
         self.not_equal(item, LAST)
 
         return self
 
+    def is_last(self, item: str):
+        self.is_equal(item, LAST)
+
+        return self
+
     def not_first(self, item: str):
         self.not_equal(item, FIRST)
+
+        return self
+
+    def is_first(self, item: str):
+        self.is_equal(item, FIRST)
 
         return self
 

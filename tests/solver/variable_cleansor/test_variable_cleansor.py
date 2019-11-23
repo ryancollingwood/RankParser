@@ -1,5 +1,5 @@
 from solver.variable_cleansor import clean_variable
-from solver.variable_cleansor import match_variable
+from solver.variable_cleansor import fuzzy_match_variable
 
 
 def test_can_call_clean_variable():
@@ -29,7 +29,7 @@ def test_clean_variable_result():
 
 def test_can_call_match_variable():
     try:
-        match_variable("cat", ("mouse", "house", "dog",))
+        fuzzy_match_variable("cat", ("mouse", "house", "dog",))
     except NameError as e:
         raise e
     except:
@@ -38,7 +38,7 @@ def test_can_call_match_variable():
 
 def test_match_variable_with_empty_existing_matches():
     expected = "So_Lonely"
-    result = match_variable("So Lonely", tuple())
+    result = fuzzy_match_variable("So Lonely", tuple())
     assert(result == expected)
 
 
@@ -46,7 +46,7 @@ def test_match_variable_gets_typo_match():
     typo = "Project managment"
     expected = "project_management"
 
-    result = match_variable(typo, ("cat", "change_management", expected,), 95)
+    result = fuzzy_match_variable(typo, ("cat", "change_management", expected,), 95)
 
     assert(result == expected)
 
@@ -55,7 +55,7 @@ def test_match_variable_doesnt_false_positive_match():
     provided = "project management"
     expected = "project_management"
 
-    result = match_variable(
+    result = fuzzy_match_variable(
         provided,
         (
             "it_project_management", "project_managers",
@@ -69,7 +69,7 @@ def test_match_variable_doesnt_false_positive_match():
 
 def test_match_variable_gets_fuzzy_match():
     expected = "house"
-    result = match_variable("mouse", ("cat", "house", "dog",), 50)
+    result = fuzzy_match_variable("mouse", ("cat", "house", "dog",), 50)
 
     assert(result == expected)
 
@@ -77,7 +77,7 @@ def test_match_variable_gets_fuzzy_match():
 def test_match_variable_gets_set_ratio():
     given = "walk the brown dog"
     expected = "walk_the_fuzzy_brown_dog"
-    result = match_variable(
+    result = fuzzy_match_variable(
         given,
         (
             "clean brown house", "walk in the park",
@@ -94,6 +94,6 @@ def test_match_different_casings():
     expected = 'Project_Management'
     existing = ('Analysis', 'Administration', 'Project_Management')
 
-    result = match_variable(given, existing)
+    result = fuzzy_match_variable(given, existing)
     assert(result == expected)
 

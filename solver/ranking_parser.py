@@ -55,7 +55,9 @@ class RankingParser(object):
         statement : entity_list
                   | is_before_statement
                   | is_after_statement
+                  | is_first_statement
                   | not_first_statement
+                  | is_last_statement
                   | not_last_statement
                   | not_first_or_last_statement
                   | not_directly_above_or_below_statement
@@ -84,6 +86,15 @@ class RankingParser(object):
         # p[0] = self._rank_prob.solve()
         p[0] = True
 
+    def p_is_first_statement(self, p):
+        """
+        is_first_statement : entity_list BEST
+        """
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.is_first(p[1])
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
+
     def p_not_first_statement(self, p):
         """
         not_first_statement : entity_list NOT BEST
@@ -91,6 +102,15 @@ class RankingParser(object):
         self._rank_prob.add_item(p[1])
         self._rank_prob.not_first(p[1])
         # p[0] = self._rank_prob.solve()
+        p[0] = True
+
+    def p_is_last_statement(self, p):
+        """
+        is_last_statement : entity_list WORST
+        """
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.is_last(p[1])
+
         p[0] = True
 
     def p_not_last_statement(self, p):

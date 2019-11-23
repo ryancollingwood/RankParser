@@ -8,7 +8,7 @@ def clean_variable(item: str):
     return new_item.replace("[", "").replace("]", "").strip().replace(" ", "_")
 
 
-def match_variable(
+def fuzzy_match_variable(
         item: str,
         existing_items: Tuple,
         tolerance: int = 90
