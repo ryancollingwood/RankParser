@@ -1,10 +1,11 @@
-from copy import copy
+from statistics import stdev
 from constraint import Problem
 from constraint import AllDifferentConstraint
-from .positions import FIRST, LAST
+from .positions import FIRST, LAST, NEARBY
 from .criteria import is_equal, not_equal
 from .criteria import not_directly_before, not_directly_after
 from .criteria import is_before, is_after
+from .criteria import is_within_range, is_just_before, is_just_after
 from .variable_cleansor import clean_variable, fuzzy_match_variable
 
 
@@ -20,6 +21,11 @@ class RankingProblem(Problem):
 
         self.addVariable(FIRST, [0])
         self.addVariable(LAST, [self._number_of_items-1])
+
+        if self._number_of_items < 10:
+            self.addVariable(NEARBY, [3])
+        else:
+            self.addVariable(NEARBY, [round(stdev(range(self._number_of_items)))])
 
         self.addVariables(self._items, range(self._number_of_items))
 
@@ -49,7 +55,7 @@ class RankingProblem(Problem):
         return self
 
     def match_variable(self, item: str):
-        if item not in [FIRST, LAST]:
+        if item not in [FIRST, LAST, NEARBY]:
             return fuzzy_match_variable(item, self._items)
         return item
 
@@ -85,7 +91,7 @@ class RankingProblem(Problem):
     def check_item_present(self, item):
         check_item = self.match_variable(item)
 
-        if check_item not in [FIRST, LAST] + list(self._items):
+        if check_item not in [FIRST, LAST, NEARBY] + list(self._items):
             raise ValueError(f"{item} not in Items")
         return True
 
@@ -159,6 +165,36 @@ class RankingProblem(Problem):
 
         self.add_rank_constraint(
             is_after, a, b
+        )
+
+        return self
+
+    def is_just_before(self, a: int, b: int):
+        self.check_item_present(a)
+        self.check_item_present(b)
+
+        self.add_rank_constraint(
+            is_just_before, a, b, NEARBY
+        )
+
+        return self
+
+    def is_just_after(self, a: int, b: int):
+        self.check_item_present(a)
+        self.check_item_present(b)
+
+        self.add_rank_constraint(
+            is_just_after, a, b, NEARBY
+        )
+
+        return self
+
+    def is_nearby(self, a: int, b: int):
+        self.check_item_present(a)
+        self.check_item_present(b)
+
+        self.add_rank_constraint(
+            is_within_range, a, b, NEARBY
         )
 
         return self

@@ -53,6 +53,7 @@ class RankingParser(object):
     def p_statement(self, p):
         """
         statement : entity_list
+                  | is_nearby_statement
                   | is_before_statement
                   | is_after_statement
                   | is_first_statement
@@ -61,6 +62,8 @@ class RankingParser(object):
                   | not_last_statement
                   | not_first_or_last_statement
                   | not_directly_above_or_below_statement
+                  | is_near_before_statement
+                  | is_near_after_statement
                   | add_item_statement
                   | remove_item_statement
         """
@@ -76,6 +79,16 @@ class RankingParser(object):
         # p[0] = self._rank_prob.solve()
         p[0] = True
 
+    def p_is_near_before_statement(self, p):
+        """
+        is_near_before_statement : entity_list NEAR BETTER entity_list
+        """
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.add_item(p[4])
+        self._rank_prob.is_just_before(p[1], p[4])
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
+
     def p_is_after_statement(self, p):
         """
         is_after_statement : entity_list WORSE entity_list
@@ -83,6 +96,26 @@ class RankingParser(object):
         self._rank_prob.add_item(p[1])
         self._rank_prob.add_item(p[3])
         self._rank_prob.is_after(p[1], p[3])
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
+
+    def p_is_near_after_statement(self, p):
+        """
+        is_near_after_statement : entity_list NEAR WORSE entity_list
+        """
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.add_item(p[4])
+        self._rank_prob.is_just_after(p[1], p[4])
+        # p[0] = self._rank_prob.solve()
+        p[0] = True
+
+    def p_is_nearby_statement(self, p):
+        """
+        is_nearby_statement : entity_list NEAR entity_list
+        """
+        self._rank_prob.add_item(p[1])
+        self._rank_prob.add_item(p[3])
+        self._rank_prob.is_nearby(p[1], p[3])
         # p[0] = self._rank_prob.solve()
         p[0] = True
 

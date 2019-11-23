@@ -14,10 +14,31 @@ def is_before(a: int, b: int):
     return distance_between(a, b) > 0
 
 
+def is_just_before(a: int, b: int, max_distance: int):
+
+    if is_before(a, b):
+        distance = distance_between(a, b)
+        return distance <= max_distance
+
+    return False
+
+
 def is_after(a: int, b: int):
     if a == b:
         return False
     return not is_before(a, b)
+
+
+def is_just_after(a: int, b: int, max_distance: int):
+    if is_after(a, b):
+        distance = distance_between(a, b)
+        return abs(distance) <= max_distance
+
+    return False
+
+
+def is_within_range(a: int, b: int, max_distance: int):
+    return abs(distance_between(a, b)) <= max_distance
 
 
 def directly_before(a: int, b: int):

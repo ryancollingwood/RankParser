@@ -23,6 +23,7 @@ class RankingLexer(object):
         'ADD',
         'REMOVE',
         'NEWLINE',
+        'NEAR',
     )
 
     # ignore whitespace and tabs
@@ -38,13 +39,14 @@ class RankingLexer(object):
     t_DIRECT = r'direct(ly)?'
     t_ADD = r'\+'
     t_REMOVE = r'\-'
+    t_NEAR = r'(near(by|ly|\-by)?|just|close)'
 
     # to support greedy entity accumulation create a look-ahead
     # regex of words that cannot be part of a run on entity
     # specification i.e. control words and article specifiers
     skip_entities = "".join([r"(?![\b\s]"+x+r"\b)" for x in [
         t_NOT, t_OR, t_BEST, t_WORST, t_BETTER, t_WORSE,
-        t_DIRECT, t_ADD, t_REMOVE, r'\n',
+        t_DIRECT, t_NEAR, t_ADD, t_REMOVE, r'\n',
         r'is', r'a', r'an', r'as'
     ]])
 
@@ -54,7 +56,7 @@ class RankingLexer(object):
     # one of the specified tokens
     ignore_regexes = [f"(?!{x})" for x in [
         t_NOT, t_OR, t_BEST, t_WORST, t_BETTER, t_WORSE,
-        t_DIRECT, t_ENTITY, t_ADD, t_REMOVE, r'\n',
+        t_DIRECT, t_NEAR, t_ENTITY, t_ADD, t_REMOVE, r'\n',
     ]]
 
     t_ignore_NOISE = r'' + "".join(ignore_regexes) + "[A-Za-z\t]{1,}"

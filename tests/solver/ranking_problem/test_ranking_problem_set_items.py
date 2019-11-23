@@ -1,6 +1,6 @@
 import pytest
 from solver.ranking_problem import RankingProblem
-from solver.positions import FIRST, LAST
+from solver.positions import FIRST, LAST, NEARBY
 
 
 def test_can_set_items():
@@ -64,7 +64,7 @@ def test_item_variable_names_after_set_items():
     r = RankingProblem()
     r.set_items(test_items)
 
-    allowed_variable_keys = test_items + [FIRST, LAST]
+    allowed_variable_keys = test_items + [FIRST, LAST, NEARBY]
 
     for key in r._variables:
         assert(key in allowed_variable_keys)
@@ -91,7 +91,7 @@ def test_ranking_problem_set_items_bracket_notation():
     r = RankingProblem()
     r.set_items(test_items)
 
-    allowed_variable_keys = expected_keys + [FIRST, LAST]
+    allowed_variable_keys = expected_keys + [FIRST, LAST, NEARBY]
 
     for key in r._variables:
         assert(key in allowed_variable_keys)
