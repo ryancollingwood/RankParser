@@ -4,20 +4,26 @@ from .ranking_viz import digraph_to_dot_viz
 
 
 class RankingNetwork(object):
-    def __init__(self, ranking_graph = None):
+    def __init__(self):
         self._G = nx.DiGraph()
         self.weighted_paths = dict()
 
-        if ranking_graph is not None:
-            self.build_from_ranking_graph(ranking_graph)
+        self.start_nodes = list()
+        self.end_nodes = list()
+        self.most_likely_path = list()
+        self.node_positions = list()
 
     def add_edge(self, start, end, weight = None):
-        self._G.add_edge(start, end, weight = weight)
+        self._G.add_edge(start, end, weight = weight, inverse_weight = 1.0 / weight)
 
     def nodes_names(self):
         return [x[0] for x in self._G.nodes]
 
-    def build_from_ranking_graph(self, ranking_graph: RankingGraph):
+    def build_from_ranking_graph(
+            self,
+            ranking_graph: RankingGraph,
+            recursively_build = True
+    ):
         for step in ranking_graph.edges():
             start = step[0]
             end = step[1]
@@ -25,9 +31,12 @@ class RankingNetwork(object):
             self.add_edge(start, end, weight)
 
         nodes = self._G.nodes(data=True)
-        node_positions = ranking_graph.node_positions()
+        self.node_positions = ranking_graph.node_positions()
+        self.start_nodes = ranking_graph.most_likely_start_nodes()
+        self.end_nodes = ranking_graph.most_likely_end_nodes()
+
         for node in nodes:
-            node[1]["position"] = node_positions[node[0]]
+            node[1]["position"] = self.node_positions[node[0]]
 
         for pair in ranking_graph.start_end_nodes():
             weighted_path_results = self.complete_paths_by_weight(pair[0], pair[1])
@@ -38,7 +47,18 @@ class RankingNetwork(object):
                 self.weighted_paths[path_weight] = list()
 
             for path in weighted_paths:
-                self.weighted_paths[path_weight].append(path)
+                if path not in self.weighted_paths[path_weight]:
+                    self.weighted_paths[path_weight].append(path)
+
+                    if path[0] in self.start_nodes and path[-1] in self.end_nodes:
+                        if path not in self.most_likely_path:
+                            self.most_likely_path.append(path)
+
+        if recursively_build:
+            new_rn = RankingNetwork()
+            return new_rn.build_from_ranking_graph(RankingGraph(self.most_likely_path), False)
+
+        return self
 
     def simplest_complete_paths(self, start, end):
         G = self._G
@@ -70,7 +90,7 @@ class RankingNetwork(object):
                     result_indexes = []
 
                 max_weight = path_weight
-                result_indexes.append(max_weight_index)
+                result_indexes.append(i)
 
         if len(result_indexes) == 0:
             return None
@@ -87,8 +107,30 @@ class RankingNetwork(object):
 
     def ranking_network_to_dot_viz(self, filename, max_pen_width = 12):
         heaviest_path_value = max(self.weighted_paths.keys())
-        highlight_paths = self.weighted_paths[heaviest_path_value]
+        # todo temp
+        # highlight_paths = self.most_likely_path
+        highlight_paths = self.most_likely_path
 
+        """
+        perhaps seomtihing in networkx can help us?
+        """
+
+        """
+        highlight_paths = [
+            x[0] in self.start_nodes and
+            x[-1] in self.end_nodes for x in
+            highlight_paths
+        ]
+        """
+
+        # TODO: highlight_paths might contain multiple paths, but we might
+        # only want to highlight the path that has the items in the order
+        # they most often appear in
+        """
+        [['Sue', 'Peter', 'John', 'Paul', 'Ryan'], 
+        ['Sue', 'Ryan', 'John', 'Paul', 'Peter']]
+        Peter has the most evidence to appear last
+        """
         return digraph_to_dot_viz(
             self._G,
             highlight_paths = highlight_paths,

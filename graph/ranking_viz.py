@@ -13,6 +13,7 @@ def digraph_to_dot_viz(
         output_dot_viz = None,
         max_pen_width = 12,
 ):
+    # TODO have an option to only show the highlight path
     dg = di_graph.copy()
     max_weight = 0
 

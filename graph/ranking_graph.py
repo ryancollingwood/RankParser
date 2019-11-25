@@ -12,6 +12,11 @@ class RankingGraph(object):
 
         if input_matrix is not None:
             self._build(input_matrix)
+        """
+        at this point we could get the mostly likely start and most likely
+        end:
+        _node_positions = defaultdict(<class 'int'>, {'Sue': 0, 'John': 20, 'Paul': 40, 'Peter': 30, 'Ryan': 30})
+        """
 
     def __getitem__(self, item=None):
         if item is None:
@@ -48,6 +53,14 @@ class RankingGraph(object):
             result[key] = int((value / max_value) * total_items)
 
         return result
+
+    def most_likely_start_nodes(self):
+        stats = self.node_positions()
+        return [key for m in [min(stats.values())] for key, val in stats.items() if val == m]
+
+    def most_likely_end_nodes(self):
+        stats = self.node_positions()
+        return [key for m in [max(stats.values())] for key, val in stats.items() if val == m]
 
     def add_nodes(self, start, end):
         edge_tuple = (start, end,)
