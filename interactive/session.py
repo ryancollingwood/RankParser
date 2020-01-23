@@ -127,6 +127,17 @@ class Session(object):
 
         generate_viz_from_solutions(solutions, filename)
 
+    def suggest_pair(self):
+        pair = None
+
+        try:
+            pair = self._rp.ranking_problem.least_most_common_variable()
+        except Exception as e:
+            print("Couldnt suggest pair", e)
+            return
+
+        print(self._hl.highlight(f"[{pair[0]}] versus [{pair[1]}]"))
+
     def read_input(self, text):
         text_split = text.split(" ")
 
@@ -156,6 +167,8 @@ class Session(object):
                 self.generate_graph(f"{self.project_id}/{text_split[1]}")
             else:
                 print("Need to specify a filename")
+        elif text_split[0] == "~":
+            self.suggest_pair()
         else:
             if len(text) > 2 and text[0] == "?":
                 self.print_token_debug(text[1:])
@@ -175,7 +188,11 @@ class Session(object):
                 break
 
             if text != "":
-                self.read_input(text)
+                try:
+                    self.read_input(text)
+                except Exception as e:
+                    print(f"Error reading input: {text}")
+                    print(e)
 
 
 if __name__ == "__main__":
