@@ -15,6 +15,10 @@ class RankingParser(object):
         self._rank_prob = RankingProblem()
         self.parser = None
 
+    @property
+    def ranking_problem(self):
+        return self._rank_prob
+
     # Error rule for syntax errors
     def p_error(self, p):
         if p is None:

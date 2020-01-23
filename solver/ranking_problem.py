@@ -222,3 +222,29 @@ class RankingProblem(Problem):
 
         result.sort()
         return result
+
+    def variable_constraints_count(self):
+        result = dict()
+        for var in sorted(self._variables):
+            if var in [FIRST, LAST, NEARBY]:
+                continue
+            result[var] = 0
+
+        for constraint in self._constraints:
+            for constraint_var in constraint[1]:
+                result[constraint_var] += 1
+
+        return result
+
+    def least_most_common_variable(self):
+        counts = self.variable_constraints_count()
+        keys = list(counts.keys())
+        values = list(counts.values())
+
+        min_value = min(values)
+        max_value = max(values)
+
+        min_index = values.index(min_value)
+        max_index = values.index(max_value)
+
+        return keys[min_index], keys[max_index]
