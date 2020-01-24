@@ -151,14 +151,21 @@ class RankingNetwork(object):
             jagged_result.append(list(step_result))
 
         temp_square_result = list(zip_longest(jagged_result, jagged_result))
-        permutations = len(temp_square_result[0])
+        permutations = max([len(x) for x in temp_square_result])
         square_result = list()
+        already_mapped = list()
+
         for item in temp_square_result:
-            flat_item = [x for sublist in item for x in sublist]
+            flat_item = [y for y in [x for sublist in item for x in sublist] if y not in already_mapped]
+
             if len(flat_item) > permutations:
-                square_result.append(list(Counter(flat_item).keys()))
-            else:
-                square_result.append(flat_item)
+                flat_item = list(Counter(flat_item).keys())
+
+            if len(flat_item) == 0:
+                continue
+
+            already_mapped += flat_item
+            square_result.append(flat_item)
 
         for i in range(permutations):
             i_result = list()
@@ -169,9 +176,6 @@ class RankingNetwork(object):
             result.append(list(i_result))
 
         return result
-
-
-
 
     def ranking_network_to_dot_viz(self, filename, max_pen_width = 12):
         highlight_paths = self.distill_highlight_path()
