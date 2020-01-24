@@ -106,34 +106,76 @@ class RankingNetwork(object):
         heaviest_path_value = max(self.weighted_paths.keys())
         return self.weighted_paths[heaviest_path_value]
 
-    def ranking_network_to_dot_viz(self, filename, max_pen_width = 12):
-        highlight_paths = self.most_likely_path
-
-        transposed_highlight_path = list(map(highlight_paths, zip(*l)))
+    def distill_highlight_path(self):
         """
-        perhaps seomtihing in networkx can help us?
-        """
-
-
-        temp_path = [
-            x[0] in self.start_nodes and
-            x[-1] in self.end_nodes for x in
-            highlight_paths
-        ]
-
-        """
-        # TODO: highlight_paths might contain multiple paths, but we might
+        # highlight_paths might contain multiple paths, but we might
         # only want to highlight the path that has the items in the order
         # they most often appear in
-        
+
         [
-            ['Sue', 'John', 'Peter', 'Ryan', 'Paul'], 
-            ['Sue', 'John', 'Ryan', 'Peter', 'Paul'], 
-            ['Sue', 'Peter', 'Ryan', 'John', 'Paul'], 
+            ['Sue', 'John', 'Peter', 'Ryan', 'Paul'],
+            ['Sue', 'John', 'Ryan', 'Peter', 'Paul'],
+            ['Sue', 'Peter', 'Ryan', 'John', 'Paul'],
             ['Sue', 'Ryan', 'Peter', 'John', 'Paul']
         ]
-        Peter has the most evidence to appear last
+
+        becomes
+
+        [
+            ['Sue', 'John', 'Peter', 'Paul'],
+            ['Sue', 'John', 'Ryan', 'Paul']
+        ]
         """
+
+        from collections import Counter
+        from itertools import zip_longest
+
+        result = list()
+
+        highlight_paths = self.most_likely_path
+
+        if len(highlight_paths) < 2:
+            return highlight_paths
+
+        jagged_result = list()
+        transposed_highlight_path = list(map(list, zip(*highlight_paths)))
+
+        for path in transposed_highlight_path:
+            step_result = set()
+            c = Counter(path)
+            max_count = max(list(c.values()))
+            for item in path:
+                if c[item] == max_count:
+                    step_result.add(item)
+
+            jagged_result.append(list(step_result))
+
+        temp_square_result = list(zip_longest(jagged_result, jagged_result))
+        permutations = len(temp_square_result[0])
+        square_result = list()
+        for item in temp_square_result:
+            flat_item = [x for sublist in item for x in sublist]
+            if len(flat_item) > permutations:
+                square_result.append(list(Counter(flat_item).keys()))
+            else:
+                square_result.append(flat_item)
+
+        for i in range(permutations):
+            i_result = list()
+            for path in square_result:
+                item = path[i]
+                if item not in i_result:
+                    i_result.append(item)
+            result.append(list(i_result))
+
+        return result
+
+
+
+
+    def ranking_network_to_dot_viz(self, filename, max_pen_width = 12):
+        highlight_paths = self.distill_highlight_path()
+
         return digraph_to_dot_viz(
             self._G,
             highlight_paths = highlight_paths,
