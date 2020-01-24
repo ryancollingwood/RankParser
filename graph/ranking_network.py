@@ -1,3 +1,4 @@
+from copy import copy
 import networkx as nx
 from .ranking_graph import RankingGraph
 from .ranking_viz import digraph_to_dot_viz
@@ -106,29 +107,31 @@ class RankingNetwork(object):
         return self.weighted_paths[heaviest_path_value]
 
     def ranking_network_to_dot_viz(self, filename, max_pen_width = 12):
-        heaviest_path_value = max(self.weighted_paths.keys())
-        # todo temp
-        # highlight_paths = self.most_likely_path
         highlight_paths = self.most_likely_path
 
+        transposed_highlight_path = list(map(highlight_paths, zip(*l)))
         """
         perhaps seomtihing in networkx can help us?
         """
 
-        """
-        highlight_paths = [
+
+        temp_path = [
             x[0] in self.start_nodes and
             x[-1] in self.end_nodes for x in
             highlight_paths
         ]
-        """
 
+        """
         # TODO: highlight_paths might contain multiple paths, but we might
         # only want to highlight the path that has the items in the order
         # they most often appear in
-        """
-        [['Sue', 'Peter', 'John', 'Paul', 'Ryan'], 
-        ['Sue', 'Ryan', 'John', 'Paul', 'Peter']]
+        
+        [
+            ['Sue', 'John', 'Peter', 'Ryan', 'Paul'], 
+            ['Sue', 'John', 'Ryan', 'Peter', 'Paul'], 
+            ['Sue', 'Peter', 'Ryan', 'John', 'Paul'], 
+            ['Sue', 'Ryan', 'Peter', 'John', 'Paul']
+        ]
         Peter has the most evidence to appear last
         """
         return digraph_to_dot_viz(
