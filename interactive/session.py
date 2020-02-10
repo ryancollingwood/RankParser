@@ -7,7 +7,7 @@ from solver import RankingParser, RankingLexer
 from interactive import HighLighter
 from interactive import STYLE_MAP
 from graph import generate_viz_from_solutions
-
+from .help import commands
 
 class Session(object):
 
@@ -138,6 +138,17 @@ class Session(object):
 
         print(self._hl.highlight(f"[{pair[0]}] versus [{pair[1]}]"))
 
+    def display_commands(self):
+        for key in commands:
+            print(f"{key} : {commands[key][0]}")
+            print(self._hl.highlight(commands[key][1]))
+
+            try:
+                self.do_tokenize(commands[key][1])
+            except:
+                pass
+            print()
+
     def read_input(self, text):
         text_split = text.split(" ")
 
@@ -147,7 +158,6 @@ class Session(object):
                 self.pp.pprint(result[0])
             elif len(result) > 1:
                 self.pp.pprint(result)
-
         elif text == "undo":
             self.undo()
         elif text == "history":
@@ -169,11 +179,15 @@ class Session(object):
                 print("Need to specify a filename")
         elif text_split[0] == "~":
             self.suggest_pair()
-        else:
-            if len(text) > 2 and text[0] == "?":
-                self.print_token_debug(text[1:])
+        elif text[0] == "?":
+            if len(text) > 2:
+                self.print_token_debug(text[1:].strip())
             else:
-                self.do_parse(text)
+                print("insufficient parameters")
+        elif text_split[0] == "help":
+            self.display_commands()
+        else:
+            self.do_parse(text)
 
     def start(self):
         self._rp.build()
