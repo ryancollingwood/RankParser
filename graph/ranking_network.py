@@ -5,7 +5,7 @@ from .ranking_viz import digraph_to_dot_viz
 
 
 class RankingNetwork(object):
-    def __init__(self):
+    def __init__(self, ranking_graph: RankingGraph = None):
         self._G = nx.DiGraph()
         self.weighted_paths = dict()
 
@@ -13,6 +13,9 @@ class RankingNetwork(object):
         self.end_nodes = list()
         self.most_likely_path = list()
         self.node_positions = list()
+
+        if ranking_graph is not None:
+            self.build_from_ranking_graph(ranking_graph)
 
     def add_edge(self, start, end, weight = None):
         self._G.add_edge(start, end, weight = weight, inverse_weight = 1.0 / weight)
