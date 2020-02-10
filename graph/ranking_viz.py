@@ -13,6 +13,7 @@ def digraph_to_dot_viz(
         output_dot_viz = None,
         max_pen_width = 12,
 ):
+    # TODO have an option to only show the highlight path
     dg = di_graph.copy()
     max_weight = 0
 
@@ -51,7 +52,7 @@ def digraph_to_dot_viz(
     edges = dg.edges(data=True)
     for path in highlight_paths:
         for i in range(len(path) - 1):
-            matching_steps = [x for x in edges if x[0] == path[i] and x[1] == path[ i +1]]
+            matching_steps = [x for x in edges if x[0] == path[i] and x[1] == path[i + 1]]
             for match_edge in matching_steps:
                 match_edge[2]["color"] = highlight_color
 

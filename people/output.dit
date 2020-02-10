@@ -1,0 +1,19 @@
+strict digraph  {
+Sue [fillcolor="#ffffff", label=Sue, position=0, shape=rectangle, style=filled];
+John [fillcolor="#cccccc", label=John, position=2, shape=rectangle, style=filled];
+Peter [fillcolor="#cccccc", label=Peter, position=2, shape=rectangle, style=filled];
+Ryan [fillcolor="#cccccc", label=Ryan, position=2, shape=rectangle, style=filled];
+Paul [fillcolor="#808080", label=Paul, position=5, shape=rectangle, style=filled];
+Sue -> John  [color=red, inverse_weight="0.5", penwidth=2];
+Sue -> Peter  [color=red, inverse_weight="1.0", penwidth=1];
+Sue -> Ryan  [color=red, inverse_weight="1.0", penwidth=1];
+John -> Peter  [color=red, inverse_weight="1.0", penwidth=1];
+John -> Ryan  [color=red, inverse_weight="1.0", penwidth=1];
+John -> Paul  [color=red, inverse_weight="0.5", penwidth=2];
+Peter -> Ryan  [color=red, inverse_weight="0.5", penwidth=2];
+Peter -> Paul  [color=red, inverse_weight="1.0", penwidth=1];
+Peter -> John  [color=red, inverse_weight="1.0", penwidth=1];
+Ryan -> Paul  [color=red, inverse_weight="1.0", penwidth=1];
+Ryan -> Peter  [color=red, inverse_weight="0.5", penwidth=2];
+Ryan -> John  [color=red, inverse_weight="1.0", penwidth=1];
+}
