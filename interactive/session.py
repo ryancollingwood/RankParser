@@ -1,13 +1,15 @@
 import uuid
 import pprint
 from os import mkdir
-from shutil import move
+from shutil import move, copytree
 from os import path
+from colorama import Style
 from solver import RankingParser, RankingLexer
 from interactive import HighLighter
 from interactive import STYLE_MAP
 from graph import generate_viz_from_solutions, export_csv
 from .help import commands
+from input_output import export_lines_to_text, import_text_to_lines, check_file_extension
 
 
 class Session(object):
@@ -32,15 +34,26 @@ class Session(object):
         else:
             self.project_id = str(uuid.uuid1())
 
-    def change_project_id(self, project_id):
-        self.generated_project = False
+    def change_project_id(self, project_id, move_files = True):
+        if self.project_id == project_id:
+            return
 
         if not path.exists(project_id):
-            move(self.project_id, project_id)
+            if self.generated_project or move_files:
+                move(self.project_id, project_id)
+            else:
+                copytree(self.project_id, project_id)
+
+            self.generated_project = False
             self.set_project_id(project_id)
         else:
+            self.generated_project = False
             self.set_project_id(project_id)
             self.load_history(project_id)
+
+    def file_in_project(self, filename, extension = "txt"):
+        output_filename = check_file_extension(filename, extension)
+        return f"{self.project_id}/{output_filename}"
 
     def do_parse(self, text, write_history = True):
         if text.strip() == "":
@@ -67,20 +80,15 @@ class Session(object):
             if not path.exists(self.project_id):
                 mkdir(self.project_id)
 
-            file_name = f"{self.project_id}/output.txt"
+            file_name = self.file_in_project("output", "txt")
 
-            with open(file_name, "w") as f:
-                for l in self.history:
-                    f.write(f"{l}\n")
+            export_lines_to_text(self.history, file_name)
         except:
             pass
 
     def load_history(self, project_id):
         file_name = f"{project_id}/output.txt"
-        lines = []
-
-        with open(file_name, "r") as f:
-            lines = f.readlines()
+        lines = import_text_to_lines(file_name)
 
         if len(lines) == 0:
             print(f"Nothing to read from {file_name}")
@@ -92,9 +100,7 @@ class Session(object):
             self.do_parse(l, write_history= False)
 
     def import_items(self, file_name):
-
-        with open(file_name, "r") as f:
-            lines = f.readlines()
+        lines = import_text_to_lines(file_name)
 
         if len(lines) == 0:
             print(f"Nothing to read from {file_name}")
@@ -104,6 +110,11 @@ class Session(object):
             self.do_parse(f"+ [{l.strip()}]")
 
         print("imported items")
+
+    def export_items(self, file_name):
+        output_file_name = self.file_in_project(file_name, "txt")
+        export_lines_to_text(self._rp.items, output_file_name)
+        print(f"exported items to {output_file_name}")
 
     def do_tokenize(self, text):
         result = self._rl.tokenize(text.strip())
@@ -134,7 +145,8 @@ class Session(object):
             print("No solutions to generate a graph from")
             return
 
-        export_csv(solutions, filename)
+        output_filename = self.file_in_project(filename, "csv")
+        export_csv(solutions, output_filename)
 
     def suggest_pair(self):
         pair = None
@@ -142,21 +154,18 @@ class Session(object):
         try:
             pair = self._rp.ranking_problem.least_most_common_variable()
         except Exception as e:
-            print("Couldnt suggest pair", e)
+            print("Couldn't suggest pair", e)
             return
 
         print(self._hl.highlight(f"[{pair[0]}] versus [{pair[1]}]"))
 
     def display_commands(self):
         for key in commands:
-            print(f"{key} : {commands[key][0]}")
+            print(Style.RESET_ALL)
+            print(f"{Style.BRIGHT}{key}{Style.NORMAL} : {commands[key][0]}")
             print(self._hl.highlight(commands[key][1]))
-
-            try:
-                self.do_tokenize(commands[key][1])
-            except:
-                pass
             print()
+        print(Style.RESET_ALL)
 
     def read_input(self, text):
         text_split = text.split(" ")
@@ -171,14 +180,24 @@ class Session(object):
             self.undo()
         elif text == "history":
             self.print_history()
-        elif text == "import_items":
+        elif text_split[0] in ["import_items", "import"]:
             if len(text_split) > 1:
                 self.import_items(text_split[1])
+            else:
+                print("Need to specify a filename")
+        elif text_split[0] in ["export_items", "export"]:
+            if len(text_split) > 1:
+                self.export_items(text_split[1])
             else:
                 print("Need to specify a filename")
         elif text_split[0] == "load":
             if len(text_split) > 1:
                 self.change_project_id(text_split[1])
+            else:
+                print("Need to specify a filename")
+        elif text_split[0] == "copy":
+            if len(text_split) > 1:
+                self.change_project_id(text_split[1], move_files=False)
             else:
                 print("Need to specify a filename")
         elif text_split[0] in ["graph", "diagram"]:

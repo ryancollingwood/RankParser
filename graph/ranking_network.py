@@ -189,12 +189,7 @@ class RankingNetwork(object):
             max_pen_width = max_pen_width,
         )
 
-    def to_csv(self, filename: str):
-        output_file = filename
-
-        if not output_file.lower()[-4:] == ".csv":
-            output_file = f"{output_file}.csv"
-
+    def to_csv(self, output_file: str):
         output_edges = nx.generate_edgelist(
             self._G, delimiter = ",",
             data=["weight"],

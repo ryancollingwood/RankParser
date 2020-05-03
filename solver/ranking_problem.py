@@ -46,6 +46,14 @@ class RankingProblem(Problem):
             tuple(cleaned_items)
         )
 
+    @property
+    def added_items(self) -> Tuple:
+        """
+        The items that have been added, to the ranking problem
+        :return:
+        """
+        return tuple([x for x in self._items if x not in [FIRST, LAST, NEARBY]])
+
     def set_items(self, items: list):
         if self._items != tuple():
             raise ValueError("Items Already Set")
