@@ -132,8 +132,6 @@ solver/parsetab.py
 output.txt
 import.txt
 import_items.txt
-interactive/highlight_out_complex.txt
-interactive/highlight_out.txt
 
 # dependencies
 graphviz-238/

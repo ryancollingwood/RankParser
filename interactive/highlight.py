@@ -1,3 +1,4 @@
+import os
 from copy import copy
 import re
 from interactive.style_map import STYLE_MAP
@@ -62,6 +63,8 @@ def test_write_out_highlighted_lines(file_name, lines):
             f.write(s_out+"\n")
             print(s_out)
         f.close()
+
+    os.remove(file_name)
 
 
 def test_highlighter():
