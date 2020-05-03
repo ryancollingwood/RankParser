@@ -195,8 +195,14 @@ class RankingNetwork(object):
         if not output_file.lower()[-4:] == ".csv":
             output_file = f"{output_file}.csv"
 
-        nx.write_edgelist(
-            self._G, output_file, delimiter = ",",
-            data = True,
+        output_edges = nx.generate_edgelist(
+            self._G, delimiter = ",",
+            data=["weight"],
         )
-        self._G.write_edgelist
+
+        columns = ["start", "end", "weight"]
+        with open(output_file, mode = "w") as txt_file:
+            txt_file.write(",".join(columns))
+            txt_file.write("\n")
+            txt_file.writelines("\n".join(output_edges))
+

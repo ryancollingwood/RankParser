@@ -1,3 +1,4 @@
+from typing import List, Tuple
 from statistics import stdev
 from constraint import Problem
 from constraint import AllDifferentConstraint
@@ -208,7 +209,7 @@ class RankingProblem(Problem):
     def number_of_constraints(self):
         return len(self._constraints)
 
-    def solve(self):
+    def solve(self) -> List[Tuple[str]]:
         result = []
         solutions = self.getSolutions()
 

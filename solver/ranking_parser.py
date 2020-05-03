@@ -211,7 +211,7 @@ class RankingParser(object):
         lexer = RankingLexer().build()
         return self.parser.parse(text, lexer=lexer)
 
-    def parse_statements(self, statements):
+    def parse_statements(self, statements, return_last_parsed = True):
         self.build()
         lexer = RankingLexer().build()
 
@@ -223,6 +223,9 @@ class RankingParser(object):
         if len(result) == 0:
             return None
 
-        return result[-1]
+        if return_last_parsed:
+            return result[-1]
+
+        return result
 
 

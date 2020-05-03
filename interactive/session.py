@@ -6,8 +6,9 @@ from os import path
 from solver import RankingParser, RankingLexer
 from interactive import HighLighter
 from interactive import STYLE_MAP
-from graph import generate_viz_from_solutions
+from graph import generate_viz_from_solutions, export_csv
 from .help import commands
+
 
 class Session(object):
 
@@ -127,6 +128,14 @@ class Session(object):
 
         generate_viz_from_solutions(solutions, filename)
 
+    def export_csv(self, filename):
+        solutions = self._rp.solve()
+        if len(solutions) == 0:
+            print("No solutions to generate a graph from")
+            return
+
+        export_csv(solutions, filename)
+
     def suggest_pair(self):
         pair = None
 
@@ -175,6 +184,11 @@ class Session(object):
         elif text_split[0] in ["graph", "diagram"]:
             if len(text_split) > 1:
                 self.generate_graph(f"{self.project_id}/{text_split[1]}")
+            else:
+                print("Need to specify a filename")
+        elif text_split[0] in ["csv"]:
+            if len(text_split) > 1:
+                self.export_csv(f"{self.project_id}/{text_split[1]}")
             else:
                 print("Need to specify a filename")
         elif text_split[0] == "~":
