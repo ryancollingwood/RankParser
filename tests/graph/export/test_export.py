@@ -14,18 +14,20 @@ def test_can_call_export_csv():
 
 def test_export_csv():
     test = RankingParser()
+    lines = None
 
     filename = str(uuid.uuid1())
     filename = f"{filename}.csv"
 
     solutions = test.parse_statements(tea_steps, return_last_parsed = False)
 
-    export_csv(solutions, filename)
+    try:
+        export_csv(solutions, filename)
 
-    lines = None
-    with open(filename, "r") as txt_file:
-        lines = txt_file.readlines()
+        with open(filename, "r") as txt_file:
+            lines = txt_file.readlines()
+    finally:
+        os.remove(filename)
 
-    assert("".join(lines) == tea_steps_result_csv)
+    assert ("".join(lines) == tea_steps_result_csv)
 
-    os.remove(filename)
