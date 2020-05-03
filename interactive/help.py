@@ -13,4 +13,5 @@ commands = {
                      ),
     "load": ("Load a previous session: load <session_name>", "load programmer_riddle"),
     "graph": ("Generate a Graphviz diagram of the current solution: graph <filename>", "graph result.dot"),
+    "csv": ("Export the edges (start, end) with the weight: csv <filename>", "csv edges.csv")
 }
