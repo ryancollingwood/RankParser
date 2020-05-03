@@ -33,7 +33,7 @@ def generate_viz_from_solutions(
     rn = RankingNetwork()
     rn = rn.build_from_ranking_graph(rg, True)
 
-    return rn.ranking_network_to_dot_viz(
+    return rn.to_dot_viz(
         output_dot_viz,
         max_pen_width = max_pen_width
     )

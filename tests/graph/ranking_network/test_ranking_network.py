@@ -98,4 +98,4 @@ def test_ranking_network_heaviest_path_from_ranking_graph():
     assert(result == expected_result)
 
     # temp
-    rn.ranking_network_to_dot_viz("dot_output.txt")
+    rn.to_dot_viz("dot_output.txt")

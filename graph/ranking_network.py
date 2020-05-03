@@ -1,4 +1,3 @@
-from copy import copy
 import networkx as nx
 from .ranking_graph import RankingGraph
 from .ranking_viz import digraph_to_dot_viz
@@ -79,7 +78,7 @@ class RankingNetwork(object):
             result += self._G.get_edge_data(path[i], path[i+1], default = 0)["weight"]
         return result
 
-    def complete_paths_by_weight(self, start, end):
+    def complete_paths_by_weight(self, start: str, end: str):
         result_indexes = []
 
         max_weight, max_weight_index = -1, -1
@@ -180,7 +179,7 @@ class RankingNetwork(object):
 
         return result
 
-    def ranking_network_to_dot_viz(self, filename, max_pen_width = 12):
+    def to_dot_viz(self, filename: str, max_pen_width: int = 12):
         highlight_paths = self.distill_highlight_path()
 
         return digraph_to_dot_viz(
@@ -189,3 +188,15 @@ class RankingNetwork(object):
             output_dot_viz = filename,
             max_pen_width = max_pen_width,
         )
+
+    def to_csv(self, filename: str):
+        output_file = filename
+
+        if not output_file.lower()[-4:] == ".csv":
+            output_file = f"{output_file}.csv"
+
+        nx.write_edgelist(
+            self._G, output_file, delimiter = ",",
+            data = True,
+        )
+        self._G.write_edgelist
