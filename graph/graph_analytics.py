@@ -1,4 +1,7 @@
+from typing import List
 import networkx as nx
+from .ranking_graph import RankingGraph
+from .ranking_network import RankingNetwork
 
 
 def calculate_demand(G):
@@ -16,24 +19,32 @@ def calculate_demand(G):
     return result
 
 
-def print_stats(G):
+def graph_stats(G):
+    result = {}
     try:
-        calculate_demand(G)
-        print("min_cost_flow")
         # https://networkx.github.io/documentation/stable/reference/algorithms/generated/networkx.algorithms.flow.min_cost_flow.html#networkx.algorithms.flow.min_cost_flow
         # demand maybe from strongly_connected_components
-        print(nx.min_cost_flow(G, capacity="inverse_weight", weight="weight"))
+        # TODO: revisit this
+        # calculate_demand(G)
+        # result["min_cost_flow"] = nx.min_cost_flow(G, capacity="inverse_weight", weight="weight")
 
-        print("pagerank")
-        print(nx.pagerank(G))
+        result["pagerank"] = nx.pagerank(G)
 
-        print("average_node_connectivity")
-        print(nx.average_node_connectivity(G))
+        result["average_node_connectivity"] = nx.average_node_connectivity(G)
 
-        print("dominating_set")
-        print(nx.dominating_set(G))
+        result["dominating_set"] = nx.dominating_set(G)
 
-        print("strongly_connected_components")
-        print(list(nx.strongly_connected_components(G)))
+        result["strongly_connected_components"] = list(nx.strongly_connected_components(G))
     except Exception:
         pass
+
+    return result
+
+
+def stats_from_solutions(solutions: List[List[str]]):
+    rg = RankingGraph(solutions)
+    rn = RankingNetwork()
+    rn = rn.build_from_ranking_graph(rg, True)
+    return graph_stats(rn.G)
+
+

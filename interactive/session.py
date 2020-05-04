@@ -1,3 +1,4 @@
+from collections import Iterable
 import uuid
 import pprint
 from os import mkdir
@@ -5,12 +6,14 @@ from shutil import move, copytree
 from os import path
 from colorama import Style
 from solver import RankingParser, RankingLexer
+from graph import RankingGraph
+from graph import RankingNetwork
 from interactive import HighLighter
 from interactive import STYLE_MAP
-from graph import generate_viz_from_solutions, export_csv
-from .help import commands
+from graph import generate_viz_from_solutions, export_csv, stats_from_solutions
 from input_output import export_lines_to_text, import_text_to_lines, check_file_extension
-
+from .help import commands
+from .printout import printout
 
 class Session(object):
 
@@ -21,6 +24,8 @@ class Session(object):
         self.set_project_id(project_id)
         self._rp = RankingParser()
         self._rl = RankingLexer()
+        self._rg = RankingGraph()
+        self._rn = RankingNetwork()
         self.lexer = self._rl.build()
         self._rp.build()
         self._hl = HighLighter(self._rl, STYLE_MAP)
@@ -165,6 +170,21 @@ class Session(object):
 
         print(self._hl.highlight(f"[{pair[0]}] versus [{pair[1]}]"))
 
+    def print_stats(self):
+        solutions = self._rp.solve()
+        if len(solutions) == 0:
+            print("No solutions to generate a stats from")
+            return
+
+        result = stats_from_solutions(solutions)
+        print(Style.RESET_ALL)
+
+        for item in result:
+            print(f"{Style.BRIGHT}{item}{Style.NORMAL}")
+            printout(result[item], item)
+
+        print(Style.RESET_ALL)
+
     def display_commands(self):
         for key in commands:
             print(Style.RESET_ALL)
@@ -218,6 +238,8 @@ class Session(object):
                 print("Need to specify a filename")
         elif text_split[0] == "~":
             self.suggest_pair()
+        elif text_split[0] in ["stats"]:
+            self.print_stats()
         elif text[0] == "?":
             if len(text) > 2:
                 self.print_token_debug(text[1:].strip())

@@ -16,6 +16,10 @@ class RankingNetwork(object):
         if ranking_graph is not None:
             self.build_from_ranking_graph(ranking_graph)
 
+    @property
+    def G(self):
+        return self._G
+
     def add_edge(self, start, end, weight = None):
         self._G.add_edge(start, end, weight = weight, inverse_weight = 1.0 / weight)
 
