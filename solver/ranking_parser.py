@@ -203,7 +203,12 @@ class RankingParser(object):
         p[0] = True
 
     def build(self, **kwargs):
-        self.parser = yacc.yacc(module=self, **kwargs)
+        self.parser = yacc.yacc(
+            module=self,
+            debug=False,
+            write_tables=False,
+            errorlog=yacc.NullLogger(),
+            **kwargs)
         return self.parser
 
     def remove_last_constraint(self):
