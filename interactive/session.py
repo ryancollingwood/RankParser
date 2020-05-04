@@ -170,7 +170,7 @@ class Session(object):
 
         print(self._hl.highlight(f"[{pair[0]}] versus [{pair[1]}]"))
 
-    def print_stats(self):
+    def print_stats(self, filename = None):
         solutions = self._rp.solve()
         if len(solutions) == 0:
             print("No solutions to generate a stats from")
@@ -184,6 +184,12 @@ class Session(object):
             printout(result[item], item)
 
         print(Style.RESET_ALL)
+
+        if filename is not None:
+            lines = list()
+            for key in result:
+                lines.append(f"{key}={result[key]}")
+            export_lines_to_text(lines, self.file_in_project(filename))
 
     def display_commands(self):
         for key in commands:
@@ -239,7 +245,10 @@ class Session(object):
         elif text_split[0] == "~":
             self.suggest_pair()
         elif text_split[0] in ["stats"]:
-            self.print_stats()
+            if len(text_split) > 1:
+                self.print_stats(text_split[1])
+            else:
+                self.print_stats()
         elif text[0] == "?":
             if len(text) > 2:
                 self.print_token_debug(text[1:].strip())

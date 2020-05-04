@@ -6,13 +6,14 @@ commands = {
     "?": ("Debug the input, displaying how it will be tokenised: ? <statement>", "? Breakfast before Dinner"),
     "history": ("Display the history of submitted statements", "history"),
     "undo": ("Remove the most recent submitted statement", "undo"),
+    "load": ("Load a previous session: load <session_name>", "load programmer_riddle"),
+    "copy": ("Copy the current session and change to it: copy <session>", "copy programmer_riddle_backup"),
     "import_items": ("Import items from a text file. "
                      "Each item must appear on it's own line in the text file: "
                      "import_items <filename>",
                      "import_items exported_tasks.txt"
                      ),
-    "load": ("Load a previous session: load <session_name>", "load programmer_riddle"),
-    "copy": ("Copy the current session and change to it: copy <session>", "copy programmer_riddle_backup"),
     "graph": ("Generate a Graphviz diagram of the current solution: graph <filename>", "graph result.dot"),
-    "csv": ("Export the edges (start, end) with the weight: csv <filename>", "csv edges.csv")
+    "csv": ("Export the edges (start, end) with the weight: csv <filename>", "csv edges.csv"),
+    "stats": ("Export graph stats (e.g. page rank) of the solution with the most support: stats <filename>", "stats graphstats"),
 }
