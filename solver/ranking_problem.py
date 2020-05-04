@@ -243,17 +243,25 @@ class RankingProblem(Problem):
             for constraint_var in constraint[1]:
                 result[constraint_var] += 1
 
-        return result
+        # return the result sorted by count
+        return {k: v for k, v in sorted(result.items(), key=lambda item: item[1])}
 
     def least_most_common_variable(self):
         counts = self.variable_constraints_count()
         keys = list(counts.keys())
         values = list(counts.values())
 
+        # min and max will return the index where
+        # multiple counts are the same
         min_value = min(values)
         max_value = max(values)
 
         min_index = values.index(min_value)
         max_index = values.index(max_value)
+
+        # if both the same go with first and last
+        if min_index == max_index:
+            min_index = 0
+            max_index = len(keys) - 1
 
         return keys[min_index], keys[max_index]
