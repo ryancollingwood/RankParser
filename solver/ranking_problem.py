@@ -2,7 +2,7 @@ from typing import List, Tuple
 from statistics import stdev
 from constraint import Problem
 from constraint import AllDifferentConstraint
-from .positions import FIRST, LAST, NEARBY
+from .positions import FIRST, LAST, NEARBY, POSITIONS
 from .criteria import is_equal, not_equal
 from .criteria import not_directly_before, not_directly_after
 from .criteria import is_before, is_after
@@ -52,7 +52,7 @@ class RankingProblem(Problem):
         The items that have been added, to the ranking problem
         :return:
         """
-        return tuple([x for x in self._items if x not in [FIRST, LAST, NEARBY]])
+        return tuple([x for x in self._items if x not in POSITIONS])
 
     def set_items(self, items: list):
         if self._items != tuple():
@@ -64,7 +64,7 @@ class RankingProblem(Problem):
         return self
 
     def match_variable(self, item: str):
-        if item not in [FIRST, LAST, NEARBY]:
+        if item not in POSITIONS:
             return fuzzy_match_variable(item, self._items)
         return item
 
@@ -100,7 +100,7 @@ class RankingProblem(Problem):
     def check_item_present(self, item):
         check_item = self.match_variable(item)
 
-        if check_item not in [FIRST, LAST, NEARBY] + list(self._items):
+        if check_item not in POSITIONS + list(self._items):
             raise ValueError(f"{item} not in Items")
         return True
 
@@ -235,7 +235,7 @@ class RankingProblem(Problem):
     def variable_constraints_count(self):
         result = dict()
         for var in sorted(self._variables):
-            if var in [FIRST, LAST, NEARBY]:
+            if var in POSITIONS:
                 continue
             result[var] = 0
 
