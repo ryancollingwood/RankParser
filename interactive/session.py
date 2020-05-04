@@ -40,9 +40,15 @@ class Session(object):
 
         if not path.exists(project_id):
             if self.generated_project or move_files:
-                move(self.project_id, project_id)
+                if path.exists(self.project_id):
+                    move(self.project_id, project_id)
+                else:
+                    mkdir(project_id)
             else:
-                copytree(self.project_id, project_id)
+                if path.exists(self.project_id):
+                    copytree(self.project_id, project_id)
+                else:
+                    mkdir(project_id)
 
             self.generated_project = False
             self.set_project_id(project_id)
