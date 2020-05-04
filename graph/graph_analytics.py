@@ -30,6 +30,12 @@ def graph_stats(G):
 
         result["pagerank"] = nx.pagerank(G)
 
+        result["betweenness_centrality"] = nx.betweenness_centrality(G)
+
+        result["degree_centrality"] = nx.degree_centrality(G)
+
+        result["eccentricity"] = nx.eccentricity(G)
+
         result["average_node_connectivity"] = nx.average_node_connectivity(G)
 
         result["dominating_set"] = nx.dominating_set(G)
