@@ -57,6 +57,7 @@ class RankingParser(object):
                     | entity_list ENTITY
         """
         p[0] = " ".join([str(x).strip() for x in p[1:]])
+        self._rank_prob.add_item(p[0])
 
     def p_statement(self, p):
         """

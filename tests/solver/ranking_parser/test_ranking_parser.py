@@ -89,3 +89,22 @@ def test_ranking_parser_parse_statements_no_statements():
 
     assert(result is None)
 
+
+def test_ranking_parser_parse_add_entity_statements():
+    rp = RankingParser()
+    expected_result = [
+        "George_Harrison",
+        "John_Lennon",
+        "Paul_McCartney",
+        "Ringo_Starr",
+    ]
+
+    result = rp.parse_statements([
+        "+[Ringo Starr]",
+        "John Lennon",
+        "[Paul McCartney]",
+        "+George Harrison",
+    ])
+
+    assert(sorted(result) == expected_result)
+
