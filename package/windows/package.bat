@@ -1,0 +1,2 @@
+virtualenv .venv
+.venv\Scripts\activate.bat & pip install -r ..\..\requirements.txt & pip install pyinstaller & pyinstaller ..\..\main.py -F --name rankparser --onefile --paths ..\..\.venv\Lib\site-packages --icon=..\..\resources\app.ico

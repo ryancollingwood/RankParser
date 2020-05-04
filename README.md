@@ -12,6 +12,9 @@ Using `python-constraint` for defining and solving the problem, and `ply` for le
 
 See [the tutorial](resources/tutorial.md) for a detailed view of the syntax.
 
+## Releases
+See [releases](https://github.com/ryancollingwood/RankParser/releases) at present only a Windows build has been made.
+
 ## Preview in Google Cloud Shell
 [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ryancollingwood/RankParser&tutorial=resources/tutorial.md)
 
