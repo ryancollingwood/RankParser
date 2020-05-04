@@ -15,6 +15,7 @@ from input_output import export_lines_to_text, import_text_to_lines, check_file_
 from .help import commands
 from .printout import printout
 
+
 class Session(object):
 
     def __init__(self, project_id = None, log_history = True):
