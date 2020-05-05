@@ -70,7 +70,7 @@ def test_ranking_problem_least_most_common_variable_returns_min_max():
 
 
 def test_ranking_problem_least_most_common_variable_unlinked_pair():
-    expected_results = ("Orange", "Green")
+    expected_results = ("Blue", "Yellow")
 
     r = RankingProblem()
     r.set_items(["Red", "Blue", "Green", "Yellow", "Orange"])
