@@ -23,7 +23,7 @@ def test_ranking_problem_variable_constraints_count():
 
 
 def test_ranking_problem_least_most_common_variable():
-    expected_results = ("Red", "Green")
+    expected_results = ("Red", "Blue")
 
     r = RankingProblem()
     r.set_items(["Red", "Blue", "Green", "Yellow"])
@@ -60,25 +60,6 @@ def test_ranking_problem_least_most_common_variable_returns_min_max():
     r.set_items(["Red", "Blue", "Green", "Yellow"])
     r.is_before("Blue", "Green")
     r.is_before("Red", "Green")
-
-    result = r.least_most_common_variable()
-
-    try:
-        assert(result == expected_results)
-    except AssertionError:
-        pytest.fail("Failed to get min and max counts items in variable_constraints_count from RankingProblem")
-
-
-def test_ranking_problem_least_most_common_variable_unlinked_pair():
-    expected_results = ("Orange", "Green")
-
-    r = RankingProblem()
-    r.set_items(["Red", "Blue", "Green", "Yellow", "Orange"])
-    r.is_before("Blue", "Green")
-    r.is_before("Red", "Green")
-    r.is_before("Yellow", "Green")
-    r.is_before("Red", "Yellow")
-    r.is_before("Orange", "Green")
 
     result = r.least_most_common_variable()
 
