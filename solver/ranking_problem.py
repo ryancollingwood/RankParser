@@ -1,4 +1,5 @@
 from typing import List, Tuple
+from itertools import chain
 from statistics import stdev
 from constraint import Problem
 from constraint import AllDifferentConstraint
@@ -246,22 +247,49 @@ class RankingProblem(Problem):
         # return the result sorted by count
         return {k: v for k, v in sorted(result.items(), key=lambda item: item[1])}
 
+    @property
+    def specified_constraints(self):
+        return [x for x in self._constraints if not isinstance(x[0], AllDifferentConstraint)]
+
+    @property
+    def item_links(self):
+        result = dict()
+        relevant_constraints = self.specified_constraints
+
+        for item in [x for x in self._items if x not in POSITIONS]:
+            item_constraints = [x[1] for x in relevant_constraints if item in x[1]]
+            result[item] = sorted(set([x for x in list(chain(*item_constraints)) if x != item]))
+        return {k: v for k, v in sorted(result.items(), key=lambda item: len(item[1]))}
+
     def least_most_common_variable(self):
         counts = self.variable_constraints_count()
         keys = list(counts.keys())
         values = list(counts.values())
+        item_links = self.item_links
 
-        # min and max will return the index where
-        # multiple counts are the same
-        min_value = min(values)
-        max_value = max(values)
+        min_index = 0
+        max_index = len(keys) - 1
 
-        min_index = values.index(min_value)
-        max_index = values.index(max_value)
+        min_key = None
+        max_key = None
 
-        # if both the same go with first and last
-        if min_index == max_index:
-            min_index = 0
-            max_index = len(keys) - 1
+        while min_index < max_index:
+            min_key = keys[min_index]
+            min_key_links = item_links[min_key]
+            max_key = keys[max_index]
+            max_key_links = item_links[max_key]
 
-        return keys[min_index], keys[max_index]
+            if len(max_key_links) == len(keys) - 1:
+                max_index -= 1
+                continue
+
+            if len(min_key_links) == len(keys) - 1:
+                break
+
+            if min_key in max_key_links:
+                min_index += 1
+                continue
+
+            break
+
+        return min_key, max_key
