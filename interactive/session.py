@@ -196,7 +196,8 @@ class Session(object):
         for key in commands:
             print(Style.RESET_ALL)
             print(f"{Style.BRIGHT}{key}{Style.NORMAL} : {commands[key][0]}")
-            print(self._hl.highlight(commands[key][1]))
+            command_example = self._hl.highlight(commands[key][1])
+            print(f"{Style.DIM}{command_example}{Style.NORMAL}")
             print()
         print(Style.RESET_ALL)
 
