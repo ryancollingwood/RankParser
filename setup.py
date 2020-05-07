@@ -1,4 +1,5 @@
 import os
+import subprocess
 from urllib import request
 from zipfile import ZipFile
 
@@ -29,10 +30,39 @@ def extract_zip(file_name, destination_folder):
     print("Extraction complete")
 
 
-if ENV_VARIABLE_NAME not in os.environ:
-    print(f"Graphviz environment variable not set - will be downloaded to: {INSTALL_TO_DIRECTORY}")
+def where_dot():
+    result = None
+    try:
+        result = subprocess.check_output("where dot.exe", shell=True)
+    except subprocess.CalledProcessError:
+        pass
+
+    if result is None:
+        try:
+            result = subprocess.check_output("whereis dot.exe", shell=True)
+        except subprocess.CalledProcessError:
+            pass
+
+    if result is None:
+        return None
+
+    result = result.decode("utf-8").split("\r\n")[0]
+    result = os.path.split(result)[0]
+
+    return result
+
+
+# os.environ["PATH"] += os.pathsep + path
+
+install_path = where_dot()
+
+if install_path is None:
+    print(f"Graphviz not found on path - will be downloaded to: {INSTALL_TO_DIRECTORY}")
     download_graphviz(WIN_GRAPHVIZ_URL, DESTINATION_FILE)
     extract_zip(DESTINATION_FILE, INSTALL_TO_DIRECTORY)
-
     print("Setting Environment Variable")
-    os.environ[ENV_VARIABLE_NAME] = DOT_PATH
+    os.environ["PATH"] += os.pathsep + DOT_PATH
+else:
+    if install_path not in os.environ["PATH"]:
+        print("Setting Environment Variable")
+        os.environ["PATH"] += os.pathsep + install_path
