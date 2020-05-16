@@ -242,6 +242,8 @@ class RankingProblem(Problem):
 
         for constraint in self._constraints:
             for constraint_var in constraint[1]:
+                if constraint_var not in result:
+                    continue
                 result[constraint_var] += 1
 
         # return the result sorted by count
