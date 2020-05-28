@@ -33,16 +33,16 @@ def test_item_variables_after_remove_item():
 
     r = RankingProblem()
     r.set_items([test_item_a, test_item_b, test_item_c])
-    assert(r._variables[test_item_a] == [0, 1, 2])
-    assert(r._variables[test_item_b] == [0, 1, 2])
-    assert(r._variables[test_item_c] == [0, 1, 2])
+    assert(r.variable_domain(test_item_a) == [0, 2])
+    assert(r.variable_domain(test_item_b) == [0, 2])
+    assert(r.variable_domain(test_item_c) == [0, 2])
 
     r.remove_item(test_item_a)
-    assert(r._variables[test_item_b] == [0, 1])
-    assert(r._variables[test_item_c] == [0, 1])
+    assert(r.variable_domain(test_item_b) == [0, 1])
+    assert(r.variable_domain(test_item_c) == [0, 1])
 
     r.remove_item(test_item_b)
-    assert(r._variables[test_item_c] == [0])
+    assert(r.variable_domain(test_item_c) == [0, 0])
 
 
 def test_last_variable_after_set_items():

@@ -33,16 +33,16 @@ def test_item_variables_after_add_item():
     r = RankingProblem()
 
     r.add_item(test_item_a)
-    assert(r._variables[test_item_a] == [0])
+    assert(r.variable_domain(test_item_a) == [0, 0])
 
     r.add_item(test_item_b)
-    assert(r._variables[test_item_a] == [0, 1])
-    assert(r._variables[test_item_b] == [0, 1])
+    assert(r.variable_domain(test_item_a) == [0, 1])
+    assert(r.variable_domain(test_item_b) == [0, 1])
 
     r.add_item(test_item_c)
-    assert(r._variables[test_item_a] == [0, 1, 2])
-    assert(r._variables[test_item_b] == [0, 1, 2])
-    assert(r._variables[test_item_c] == [0, 1, 2])
+    assert(r.variable_domain(test_item_a) == [0, 2])
+    assert(r.variable_domain(test_item_b) == [0, 2])
+    assert(r.variable_domain(test_item_c) == [0, 2])
 
 
 def test_last_variable_after_set_items():
@@ -53,16 +53,16 @@ def test_last_variable_after_set_items():
     r = RankingProblem()
 
     r.add_item(test_item_a)
-    assert(r._variables[LAST] == [0])
-    assert(r._variables[FIRST] == [0])
+    assert(r.variable_domain(LAST) == [0, 0])
+    assert(r.variable_domain(FIRST) == [0, 0])
 
     r.add_item(test_item_b)
-    assert(r._variables[LAST] == [1])
-    assert (r._variables[FIRST] == [0])
+    assert(r.variable_domain(LAST) == [1, 1])
+    assert (r.variable_domain(FIRST) == [0, 0])
 
     r.add_item(test_item_c)
-    assert(r._variables[LAST] == [2])
-    assert (r._variables[FIRST] == [0])
+    assert(r.variable_domain(LAST) == [2, 2])
+    assert (r.variable_domain(FIRST) == [0, 0])
 
 
 def test_ranking_problem_add_item_no_duplicates():
