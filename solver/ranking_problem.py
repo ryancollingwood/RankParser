@@ -1,8 +1,9 @@
 from typing import List, Tuple
 from itertools import chain
 from statistics import stdev
-from constraint import Problem
-from constraint import AllDifferentConstraint
+#from constraint import Problem
+#from constraint import AllDifferentConstraint
+from ortools.sat.python import cp_model
 from .positions import FIRST, LAST, NEARBY, POSITIONS
 from .criteria import is_equal, not_equal
 from .criteria import not_directly_before, not_directly_after
@@ -11,12 +12,24 @@ from .criteria import is_within_range, is_just_before, is_just_after
 from .variable_cleansor import clean_variable, fuzzy_match_variable
 
 
-class RankingProblem(Problem):
+class RankingProblem():
 
     def __init__(self):
         super().__init__()
+        self._model = cp_model.CpModel()
         self._items = tuple()
         self._number_of_items = 0
+        self._variables = list()
+        self._constraints = list()
+
+    def addVariable(self, name, max_value):
+        self._variables.append(
+            self.NewIntVar(0, max_value, str(name))
+        )
+
+    def addVariables(self, names, max_value):
+        for name in names:
+            self.addVariable(name, max_value)
 
     def _reset_vars(self):
         self._number_of_items = len(self._items)
@@ -31,20 +44,13 @@ class RankingProblem(Problem):
 
         self.addVariables(self._items, range(self._number_of_items))
 
-        # given self._items might have changed update the
-        # first constraint to consider the new set of self._items
-        # otherwise we'd be adding redundant constraints
-        if len(self._constraints) > 0:
-            self._constraints[0] = (AllDifferentConstraint(), self._items)
-        else:
-            self.addConstraint(AllDifferentConstraint(), self._items)
+        self.AddAllDifferent(self._variables)
 
     def add_rank_constraint(self, comparison_func, *items):
         cleaned_items = [self.match_variable(x) for x in items]
 
-        self.addConstraint(
-            comparison_func,
-            tuple(cleaned_items)
+        self.Add(
+            comparison_func(*cleaned_items)
         )
 
     @property
