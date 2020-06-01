@@ -6,10 +6,7 @@ from statistics import stdev
 from ortools.sat.python import cp_model
 from .ranking_solver import RankingSolver
 from .positions import FIRST, LAST, NEARBY, POSITIONS
-from .criteria import is_equal, not_equal
-from .criteria import not_directly_before, not_directly_after
-from .criteria import is_before, is_after
-from .criteria import is_within_range, is_just_before, is_just_after
+from .criteria import is_before, is_after, is_within_range, is_just_before, is_just_after
 from .variable_cleansor import clean_variable, fuzzy_match_variable
 
 
@@ -19,57 +16,52 @@ class RankingProblem():
         super().__init__()
         self._model = cp_model.CpModel()
         self._results = list()
-        self._items = tuple()
-        self._number_of_items = 0
         self._variables = dict()
         self._constraints = list()
+        self._nearby = 3
 
-    def addVariable(self, name, min_value = 0, max_value = None):
-        if max_value is None:
-            range_max_value = len(self.added_items) - 1
-        else:
-            range_max_value = max_value
+    def add_variable(self, name, min_value = 0, max_value = None):
+        self._variables[name] = (min_value, max_value)
 
-        if name not in self._variables:
-            self._variables[str(name)] = self._model.NewIntVar(min_value, range_max_value, str(name))
-        else:
-            # self._variables[str(name)]._IntVar__var.domain.extend([min_value, max_value])
-            self._variables[str(name)]._IntVar__var.domain.pop()
-            self._variables[str(name)]._IntVar__var.domain.pop()
-            self._variables[str(name)]._IntVar__var.domain.extend([min_value, max_value])
+    def remove_variable(self, name):
+        if name in self._variables:
+            del self._variables[name]
 
-    def addVariables(self, names, min_value = 0, max_value = None):
+    def add_variables(self, names, min_value = 0, max_value = None):
         for name in names:
-            self.addVariable(name, min_value, max_value)
+            self.add_variable(name, min_value, max_value)
 
     def variable_domain(self, variable_name):
-        return self._variables[variable_name]._IntVar__var.domain
+        return self._variables[variable_name]
 
     def _reset_vars(self):
-        self._number_of_items = len(self.added_items)
-
-        self.addVariable(FIRST, 0, 0)
-
-        self.addVariable(LAST, self._number_of_items, self._number_of_items)
-
-        if self._number_of_items < 10:
-            self.addVariable(NEARBY, 1, 3)
+        number_of_added_item = len(self.added_items)
+        if number_of_added_item < 10:
+            self._nearby = 3
         else:
-            nearby_value = round(stdev(range(self._number_of_items)))
-            self.addVariable(NEARBY, 1, nearby_value)
-
-        self.addVariables(self._items, 0, self._number_of_items - 1)
-
-        self._model.AddAllDifferent([self._variables[x] for x in self.added_items])
+            nearby_value = round(stdev(range(number_of_added_item)))
+            self._nearby = nearby_value
 
     def add_rank_constraint(self, comparison_func, *items):
+
+        for item in items:
+            self.check_item_present(item)
+
         cleaned_items = [self.match_variable(x) for x in items]
 
-        variables = [x for x in [self._variables[y] for y in cleaned_items]]
+        variable_items = list()
+        for ci in cleaned_items:
+            if isinstance(ci, int):
+                variable_items.append(ci)
+            else:
+                variable_items.append(f"variables['{ci}']")
 
-        self._model.Add(
-            comparison_func(*variables)
-        )
+        new_constraint = comparison_func.format(*variable_items)
+
+        if new_constraint not in self._constraints:
+            self._constraints.append(
+                new_constraint
+            )
 
     @property
     def added_items(self) -> Tuple:
@@ -77,80 +69,57 @@ class RankingProblem():
         The items that have been added, to the ranking problem
         :return:
         """
-        return tuple([x for x in self._items if x not in POSITIONS])
+        return tuple([x for x in self._variables if x not in POSITIONS])
 
     def set_items(self, items: list):
-        if self._items != tuple():
-            raise ValueError("Items Already Set")
-
-        self._items = tuple([clean_variable(x) for x in items])
-        self._reset_vars()
+        self.add_variables([clean_variable(x) for x in items])
 
         return self
 
     def match_variable(self, item: str):
+        if isinstance(item, int):
+            return item
+
         if item not in POSITIONS:
-            return fuzzy_match_variable(item, self._items)
+            return fuzzy_match_variable(item, tuple(self._variables.keys()))
         return item
 
     def add_item(self, item: str):
         new_item = self.match_variable(item)
-
-        if new_item not in self._items:
-            # calling self.reset will remove
-            # previously added constraints
-            # we only want to reset variables
-            # self._variables.clear()
-            self._items = self._items + (new_item,)
-            self.addVariable(new_item)
-            self._reset_vars()
+        self.add_variable(new_item)
 
         return self
 
     def remove_item(self, item: str):
         item_to_remove = self.match_variable(item)
-
-        if item_to_remove in self._items:
-            new_items = list(self._items)
-            new_items.remove(item_to_remove)
-
-            #self._variables.clear()
-            del self._variables[item_to_remove]
-
-            if (new_items is not None) and len(new_items) > 0:
-                self._items = tuple(new_items)
-            else:
-                self._items = tuple()
-            self._reset_vars()
+        self.remove_variable(item_to_remove)
 
         return self
 
     def check_item_present(self, item):
+
+        if isinstance(item, int):
+            return True
+
         check_item = self.match_variable(item)
 
-        if check_item not in POSITIONS + list(self._items):
+        if check_item not in POSITIONS + list(self._variables.keys()):
             raise ValueError(f"{item} not in Items")
         return True
 
     def not_equal(self, a: str, b: str):
-        self.check_item_present(a)
-        self.check_item_present(b)
-
-        a_match = self.match_variable(a)
-        b_match = self.match_variable(b)
-
-        self._model.Add(self._variables[a_match] != self._variables[b_match])
+        self.add_rank_constraint(
+            "{} != {}",
+            a, b,
+        )
 
         return self
 
     def is_equal(self, a: str, b: str):
-        self.check_item_present(a)
-        self.check_item_present(b)
-
-        a_match = self.match_variable(a)
-        b_match = self.match_variable(b)
-
-        self._model.Add(self._variables[a_match] == self._variables[b_match])
+        self.add_rank_constraint(
+            "{} == {}",
+            a, b,
+        )
 
         return self
 
@@ -175,66 +144,69 @@ class RankingProblem():
         return self
 
     def not_directly_before_or_after(self, a: str, b: str):
-        self.check_item_present(a)
-        self.check_item_present(b)
-
-        a_match = self.match_variable(a)
-        b_match = self.match_variable(b)
-
-        self._model.Add(self._variables[a_match] == self._variables[b_match] - 1)
-
-        self._model.Add(self._variables[a_match] == self._variables[b_match] + 1)
-
-        return self
-
-    def is_before(self, a: str, b: str):
-        self.check_item_present(a)
-        self.check_item_present(b)
-
-        a_match = self.match_variable(a)
-        b_match = self.match_variable(b)
-
-        self._model.Add(self._variables[a_match] < self._variables[b_match])
-
-        return self
-
-    def is_after(self, a: str, b: str):
-        self.check_item_present(a)
-        self.check_item_present(b)
-
-        a_match = self.match_variable(a)
-        b_match = self.match_variable(b)
-
-        self._model.Add(self._variables[a_match] > self._variables[b_match])
-
-        return self
-
-    def is_just_before(self, a: int, b: int):
-        self.check_item_present(a)
-        self.check_item_present(b)
+        self.add_rank_constraint(
+            "{} != {} - 1",
+            a, b
+        )
 
         self.add_rank_constraint(
-            is_just_before, a, b, NEARBY
+            "{} != {} + 1",
+            a, b
         )
 
         return self
 
-    def is_just_after(self, a: int, b: int):
-        self.check_item_present(a)
-        self.check_item_present(b)
+    def is_before(self, a: str, b: str):
+        self.add_rank_constraint(
+            "{} < {}",
+            a, b
+        )
+
+        return self
+
+    def is_after(self, a: str, b: str):
+        self.add_rank_constraint(
+            "{} > {}",
+            a, b
+        )
+
+        return self
+
+    def is_just_before(self, a: int, b: int):
+        self.add_rank_constraint(
+            "{} >= {} - {}",
+            a, b, NEARBY
+        )
 
         self.add_rank_constraint(
-            is_just_after, a, b, NEARBY
+            "{} < {}",
+            a, b
+        )
+        return self
+
+    def is_just_after(self, a: int, b: int):
+        self.add_rank_constraint(
+            "{} <= {} + {}",
+            a, b, NEARBY
+        )
+
+        self.add_rank_constraint(
+            "{} > {}",
+            a, b
         )
 
         return self
 
     def is_nearby(self, a: int, b: int):
-        self.check_item_present(a)
-        self.check_item_present(b)
 
         self.add_rank_constraint(
-            is_within_range, a, b, NEARBY
+            "{} >= {} - {}",
+            a, b, NEARBY
+        )
+
+        self.add_rank_constraint(
+            "{} <= {} + {}",
+            a, b, NEARBY
         )
 
         return self
@@ -250,8 +222,32 @@ class RankingProblem():
 
     def solve(self) -> List[Tuple[str]]:
         result = []
+
+        self._reset_vars()
+        self._model = cp_model.CpModel()
+        number_of_added_item = len(self._variables)
+
+        variables = dict()
+
+        for k, v in self._variables.items():
+            range_min = v[0] if v[0] else 0
+            range_max = v[1] if v[1] else number_of_added_item - 1
+            variables[k] = self._model.NewIntVar(range_min, range_max, k)
+
+        variables[FIRST] = 0
+        variables[LAST] = number_of_added_item - 1
+        variables[NEARBY] = self._nearby
+
+        for c in self._constraints:
+            self._model.Add(eval(c))
+
+        # exclude positions
+        constraint_variables = [v for k, v in variables.items() if k not in POSITIONS]
+
+        self._model.AddAllDifferent(constraint_variables)
+
         solver = cp_model.CpSolver()
-        solution_callback = RankingSolver([x for x in self._variables.values()])
+        solution_callback = RankingSolver(constraint_variables)
 
         status = solver.Solve(self._model)
         if status in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
@@ -270,11 +266,11 @@ class RankingProblem():
             result[item] = len(result[item])
 
         # return the result sorted by count
-        return {k: v for k, v in sorted(result.items(), key=lambda item: item[1])}
+        return {k: v for k, v in sorted(result.items(), key=lambda sort_item: sort_item[1])}
 
     @property
     def specified_constraints(self):
-        return [x for x in self._model._CpModel__model.constraints if len(x.linear.vars)> 0]
+        return [x for x in self._constraints]
 
     @property
     def item_links(self):
