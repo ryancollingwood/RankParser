@@ -230,10 +230,10 @@ class RankingParser(object):
 
         result = self.solve()
 
-        if len(result) == 0:
+        if result and len(result) == 0:
             return None
 
-        if return_last_parsed:
+        if result and return_last_parsed:
             return result[-1]
 
         return result

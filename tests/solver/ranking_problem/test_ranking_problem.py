@@ -12,5 +12,5 @@ def test_items_are_empty_on_creation():
 
 def test_number_of_items_is_zero_on_creation():
     r = RankingProblem()
-    assert(r._number_of_items == 0)
+    assert(len(r.added_items) == 0)
 

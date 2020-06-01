@@ -4,10 +4,10 @@ from solver.ranking_problem import RankingProblem
 
 def test_ranking_problem_variable_constraints_count():
     expected_results = {
-        "Blue": 3,
-        "Green": 3,
-        "Red": 1,
-        "Yellow": 1,
+        "Blue": 1,
+        "Green": 1,
+        "Red": 0,
+        "Yellow": 0,
     }
 
     r = RankingProblem()

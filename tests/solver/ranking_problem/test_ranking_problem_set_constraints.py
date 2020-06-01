@@ -25,8 +25,8 @@ def test_not_equal_constraint_set():
     r.set_items(["Dog", "Cat"])
     r.not_equal("Dog", "Cat")
 
-    assert(r._constraints[1][1] == ("Dog", "Cat"))
-    assert(r._constraints[1][0]._func.__name__ == "not_equal")
+    assert(r._constraints[0].items == ("Dog", "Cat"))
+    assert(str(r._constraints[0]) == "Dog != Cat")
 
 
 def test_can_call_not_last():
@@ -67,8 +67,8 @@ def test_not_last_constraint_set():
     r.set_items(["Dog"])
     r.not_first("Dog")
 
-    assert(r._constraints[1][1] == ("Dog", FIRST))
-    assert(r._constraints[1][0]._func.__name__ == "not_equal")
+    assert(r._constraints[0].items == ("Dog", "FIRST"))
+    assert(str(r._constraints[0]) == "Dog != FIRST")
 
 
 def test_can_call_not_directly_above_or_below():
@@ -89,11 +89,9 @@ def test_not_directly_above_or_below_constraint_set():
     r.set_items(["Dog", "Cat"])
     r.not_directly_before_or_after("Dog", "Cat")
 
-    assert(r._constraints[1][1] == ("Dog", "Cat"))
-    assert(r._constraints[1][0]._func.__name__ == "not_directly_before")
-
-    assert (r._constraints[2][1] == ("Dog", "Cat"))
-    assert (r._constraints[2][0]._func.__name__ == "not_directly_after")
+    assert(r._constraints[0].items == ("Dog", "Cat"))
+    assert(str(r._constraints[0]) == 'Dog != Cat - 1')
+    assert(str(r._constraints[1]) == 'Dog != Cat + 1')
 
 
 def test_can_call_is_before():
@@ -136,5 +134,5 @@ def test_is_before_constraint_set():
     r.set_items(["Dog", "Cat"])
     r.is_after("Dog", "Cat")
 
-    assert(r._constraints[1][1] == ("Dog", "Cat"))
-    assert(r._constraints[1][0]._func.__name__ == "is_after")
+    assert(r._constraints[0].items == ("Dog", "Cat"))
+    assert(str(r._constraints[0]) == "Dog > Cat")

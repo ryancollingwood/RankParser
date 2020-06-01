@@ -11,6 +11,10 @@ class RankingSolver(cp_model.CpSolverSolutionCallback):
         self.results = list()
 
     def on_solution_callback(self):
+        if len(self.__variables) == 0:
+            self.StopSearch()
+            return
+
         self.__solution_count += 1
         callback_result = dict()
         for v in self.__variables:

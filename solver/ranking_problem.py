@@ -1,22 +1,21 @@
 from typing import List, Tuple
 from itertools import chain
 from statistics import stdev
-#from constraint import Problem
-#from constraint import AllDifferentConstraint
 from ortools.sat.python import cp_model
+from .constraint_expression import ConstraintExpression
 from .ranking_solver import RankingSolver
 from .positions import FIRST, LAST, NEARBY, POSITIONS
-from .criteria import is_before, is_after, is_within_range, is_just_before, is_just_after
 from .variable_cleansor import clean_variable, fuzzy_match_variable
 
 
-class RankingProblem():
+class RankingProblem:
 
     def __init__(self):
         super().__init__()
         self._model = cp_model.CpModel()
         self._results = list()
         self._variables = dict()
+        self._items = tuple()
         self._constraints = list()
         self._nearby = 3
 
@@ -49,14 +48,7 @@ class RankingProblem():
 
         cleaned_items = [self.match_variable(x) for x in items]
 
-        variable_items = list()
-        for ci in cleaned_items:
-            if isinstance(ci, int):
-                variable_items.append(ci)
-            else:
-                variable_items.append(f"variables['{ci}']")
-
-        new_constraint = comparison_func.format(*variable_items)
+        new_constraint = ConstraintExpression(comparison_func, *cleaned_items)
 
         if new_constraint not in self._constraints:
             self._constraints.append(
@@ -71,8 +63,18 @@ class RankingProblem():
         """
         return tuple([x for x in self._variables if x not in POSITIONS])
 
+    @property
+    def number_of_items(self):
+        return len(self._items)
+
     def set_items(self, items: list):
-        self.add_variables([clean_variable(x) for x in items])
+        if self._items != tuple():
+            raise ValueError("Items Already Set")
+
+        cleaned_items = [x for x in [clean_variable(item) for item in items] if x not in POSITIONS]
+
+        self._items = tuple(cleaned_items)
+        self.add_variables(cleaned_items)
 
         return self
 
@@ -86,13 +88,26 @@ class RankingProblem():
 
     def add_item(self, item: str):
         new_item = self.match_variable(item)
-        self.add_variable(new_item)
+
+        if new_item not in self._items:
+            self._items = self._items + (new_item,)
+            self.add_variable(new_item)
 
         return self
 
     def remove_item(self, item: str):
         item_to_remove = self.match_variable(item)
-        self.remove_variable(item_to_remove)
+
+        if item_to_remove in self._items:
+            new_items = list(self._items)
+            new_items.remove(item_to_remove)
+
+            if (new_items is not None) and len(new_items) > 0:
+                self._items = tuple(new_items)
+            else:
+                self._items = tuple()
+
+            self.remove_variable(item_to_remove)
 
         return self
 
@@ -239,7 +254,7 @@ class RankingProblem():
         variables[NEARBY] = self._nearby
 
         for c in self._constraints:
-            self._model.Add(eval(c))
+            self._model.Add(eval(c.express("variables['{}']")))
 
         # exclude positions
         constraint_variables = [v for k, v in variables.items() if k not in POSITIONS]
@@ -257,7 +272,11 @@ class RankingProblem():
 
         result = solution_callback.results
 
+        if len(result) == 0:
+            return None
+
         result.sort()
+
         return result
 
     def variable_constraints_count(self):
@@ -276,14 +295,14 @@ class RankingProblem():
     def item_links(self):
         result = dict()
         relevant_constraints = self.specified_constraints
-        variables = self._model._CpModel__model.variables
+        variables = self._variables
 
         for index, item in enumerate(variables):
-            if item.name in POSITIONS:
+            if item in POSITIONS:
                 continue
-            item_constraints = [x.linear.vars for x in relevant_constraints if index in x.linear.vars]
-            result_indexes = set([x for x in list(chain(*item_constraints)) if x != index])
-            result[item.name] = sorted([variables[x].name for x in result_indexes])
+            item_constraints = [x.items for x in relevant_constraints if item in x.items]
+            item_links = set([x for x in list(chain(*item_constraints)) if x != item])
+            result[item] = sorted(item_links)
         return {k: v for k, v in sorted(result.items(), key=lambda item: len(item[1]))}
 
     def least_most_common_variable(self):
