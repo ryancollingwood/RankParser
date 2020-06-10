@@ -33,35 +33,16 @@ def test_item_variables_after_remove_item():
 
     r = RankingProblem()
     r.set_items([test_item_a, test_item_b, test_item_c])
-    assert(r._variables[test_item_a] == [0, 1, 2])
-    assert(r._variables[test_item_b] == [0, 1, 2])
-    assert(r._variables[test_item_c] == [0, 1, 2])
+    assert(r.variable_domain(test_item_a) == (0, None))
+    assert(r.variable_domain(test_item_b) == (0, None))
+    assert(r.variable_domain(test_item_c) == (0, None))
 
     r.remove_item(test_item_a)
-    assert(r._variables[test_item_b] == [0, 1])
-    assert(r._variables[test_item_c] == [0, 1])
+    assert(r.variable_domain(test_item_b) == (0, None))
+    assert(r.variable_domain(test_item_c) == (0, None))
 
     r.remove_item(test_item_b)
-    assert(r._variables[test_item_c] == [0])
-
-
-def test_last_variable_after_set_items():
-    test_item_a = "a"
-    test_item_b = "b"
-    test_item_c = "c"
-
-    r = RankingProblem()
-    r.set_items([test_item_a, test_item_b, test_item_c])
-    assert(r._variables[LAST] == [2])
-    assert (r._variables[FIRST] == [0])
-
-    r.remove_item(test_item_a)
-    assert(r._variables[LAST] == [1])
-    assert (r._variables[FIRST] == [0])
-
-    r.remove_item(test_item_b)
-    assert(r._variables[LAST] == [0])
-    assert(r._variables[FIRST] == [0])
+    assert(r.variable_domain(test_item_c) == (0, None))
 
 
 def test_ranking_problem_remove_item_no_duplicates():

@@ -30,7 +30,7 @@ def test_number_of_items_correct():
     r = RankingProblem()
     r.set_items(test_items)
 
-    assert(r._number_of_items == len(test_items))
+    assert(r.number_of_items == len(test_items))
 
 
 def test_cannot_change_items():
@@ -42,11 +42,11 @@ def test_cannot_change_items():
         r.set_items(["Foo", "Bar"])
 
 
-def test_last_variable_after_set_items():
-    test_items = ["Cat", "Dog", "Mouse"]
+def test_last_variable_not_included_after_set_items():
+    test_items = ["Cat", "Dog", "Mouse", "LAST"]
     r = RankingProblem()
     r.set_items(test_items)
-    assert(r._variables[LAST] == [2])
+    assert("LAST" not in r._variables)
 
 
 def test_item_variables_after_set_items():
@@ -54,9 +54,9 @@ def test_item_variables_after_set_items():
     r = RankingProblem()
     r.set_items(test_items)
 
-    assert(r._variables["Cat"] == [0, 1, 2])
-    assert(r._variables["Dog"] == [0, 1, 2])
-    assert (r._variables["Mouse"] == [0, 1, 2])
+    assert(r._variables["Cat"] == (0, None))
+    assert(r._variables["Dog"] == (0, None))
+    assert(r._variables["Mouse"] == (0, None))
 
 
 def test_item_variable_names_after_set_items():
