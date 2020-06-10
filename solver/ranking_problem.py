@@ -46,15 +46,6 @@ class RankingProblem:
         for name in names:
             self.__add_variable(name, min_value, max_value)
 
-    def variable_domain(self, variable_name: str) -> Tuple[int, int]:
-        """
-        Return the domain of given domain.
-
-        :param variable_name:
-        :return:
-        """
-        return self._variables[variable_name]
-
     def __reset_vars(self):
         """
         Reset the state of derived variables such as the `nearby_value`
@@ -107,6 +98,103 @@ class RankingProblem:
         :return:
         """
         return len(self._items)
+
+    @property
+    def number_of_constraints(self):
+        """
+        How many constraints have been specified
+        :return:
+        """
+        return len(self._constraints)
+
+    @property
+    def variable_constraints_count(self) -> Dict[str, int]:
+        """
+        How many constraints does each variable participate in?
+
+        :return: Dictionary of variable names with the number
+            of constraints it participate in
+        """
+        result = self.item_links
+        for item in result:
+            result[item] = len(result[item])
+
+        # return the result sorted by count
+        return {k: v for k, v in sorted(result.items(), key=lambda sort_item: sort_item[1])}
+
+    @property
+    def specified_constraints(self):
+        return [x for x in self._constraints]
+
+    @property
+    def item_links(self) -> Dict[str, List[str]]:
+        """
+        Detail the items an item is linked to via specified constraints.
+
+        :return: Dict[str, List[str]]
+        """
+        result = dict()
+        relevant_constraints = self.specified_constraints
+        variables = self._variables
+
+        for index, item in enumerate(variables):
+            if item in POSITIONS:
+                continue
+            item_constraints = [x.items for x in relevant_constraints if item in x.items]
+            item_links = set([x for x in list(chain(*item_constraints)) if x != item])
+            result[item] = sorted(item_links)
+        return {k: v for k, v in sorted(result.items(), key=lambda x: len(x[1]))}
+
+    @property
+    def least_most_common_variable(self) -> Tuple[str, str]:
+        """
+        Return a pair of variables where the first variable is the variable
+        with least amount of links to other variables and the second is
+        the variable with the greatest number of links, that does not include the
+        first variable returned.
+
+        :return: Tuple[str, str]
+        """
+        counts = self.variable_constraints_count
+        keys = list(counts.keys())
+        values = list(counts.values())
+        item_links = self.item_links
+
+        min_index = 0
+        max_index = len(keys) - 1
+
+        min_key = None
+        max_key = None
+
+        while min_index < max_index:
+            min_key = keys[min_index]
+            min_key_links = item_links[min_key]
+            max_key = keys[max_index]
+            max_key_links = item_links[max_key]
+
+            if len(max_key_links) == len(keys) - 1:
+                max_index -= 1
+                continue
+
+            if len(min_key_links) == len(keys) - 1:
+                break
+
+            if min_key in max_key_links:
+                min_index += 1
+                continue
+
+            break
+
+        return min_key, max_key
+
+    def variable_domain(self, variable_name: str) -> Tuple[int, int]:
+        """
+        Return the domain of given domain.
+
+        :param variable_name:
+        :return:
+        """
+        return self._variables[variable_name]
 
     def set_items(self, items: list):
         """
@@ -313,14 +401,6 @@ class RankingProblem:
 
         return self
 
-    @property
-    def number_of_constraints(self):
-        """
-        How many constraints have been specified
-        :return:
-        """
-        return len(self._constraints)
-
     def solve(self) -> List[Tuple[str]]:
         """
         Solve the constraints and return the results.
@@ -370,82 +450,3 @@ class RankingProblem:
         result.sort()
 
         return result
-
-    @property
-    def variable_constraints_count(self) -> Dict[str, int]:
-        """
-        How many constraints does each variable participate in?
-
-        :return: Dictionary of variable names with the number
-            of constraints it participate in
-        """
-        result = self.item_links
-        for item in result:
-            result[item] = len(result[item])
-
-        # return the result sorted by count
-        return {k: v for k, v in sorted(result.items(), key=lambda sort_item: sort_item[1])}
-
-    @property
-    def specified_constraints(self):
-        return [x for x in self._constraints]
-
-    @property
-    def item_links(self) -> Dict[str, List[str]]:
-        """
-        Detail the items an item is linked to via specified constraints.
-
-        :return: Dict[str, List[str]]
-        """
-        result = dict()
-        relevant_constraints = self.specified_constraints
-        variables = self._variables
-
-        for index, item in enumerate(variables):
-            if item in POSITIONS:
-                continue
-            item_constraints = [x.items for x in relevant_constraints if item in x.items]
-            item_links = set([x for x in list(chain(*item_constraints)) if x != item])
-            result[item] = sorted(item_links)
-        return {k: v for k, v in sorted(result.items(), key=lambda x: len(x[1]))}
-
-    def least_most_common_variable(self) -> Tuple[str, str]:
-        """
-        Return a pair of variables where the first variable is the variable
-        with least amount of links to other variables and the second is
-        the variable with the greatest number of links, that does not include the
-        first variable returned.
-
-        :return: Tuple[str, str]
-        """
-        counts = self.variable_constraints_count
-        keys = list(counts.keys())
-        values = list(counts.values())
-        item_links = self.item_links
-
-        min_index = 0
-        max_index = len(keys) - 1
-
-        min_key = None
-        max_key = None
-
-        while min_index < max_index:
-            min_key = keys[min_index]
-            min_key_links = item_links[min_key]
-            max_key = keys[max_index]
-            max_key_links = item_links[max_key]
-
-            if len(max_key_links) == len(keys) - 1:
-                max_index -= 1
-                continue
-
-            if len(min_key_links) == len(keys) - 1:
-                break
-
-            if min_key in max_key_links:
-                min_index += 1
-                continue
-
-            break
-
-        return min_key, max_key
