@@ -18,8 +18,8 @@ def test_ranking_problem_remove_last_constraint_removes_constraint():
     rank_prob.set_items(["Huey", "Dewey", "Louie"]).\
         is_before("Louie", "Dewey")
 
-    number_of_constraints = rank_prob.number_of_constraints()
+    number_of_constraints = rank_prob.number_of_constraints
     rank_prob.remove_last_constraint()
 
-    assert(number_of_constraints == rank_prob.number_of_constraints() + 1)
+    assert(number_of_constraints == rank_prob.number_of_constraints + 1)
 

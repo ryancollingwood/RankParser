@@ -14,7 +14,7 @@ def test_ranking_problem_variable_constraints_count():
     r.set_items(["Red", "Blue", "Green", "Yellow"])
     r.not_directly_before_or_after("Blue", "Green")
 
-    result = r.variable_constraints_count()
+    result = r.variable_constraints_count
 
     try:
         assert(result == expected_results)
