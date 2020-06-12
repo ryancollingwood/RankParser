@@ -19,7 +19,6 @@ class RankingProblem:
         self._items = tuple()
         self._constraints = list()
         self._nearby = 3
-        self.is_solvable = True
 
     def __add_variable(self, name: str, min_value: int = 0, max_value: int = None):
         """
@@ -83,12 +82,14 @@ class RankingProblem:
                 new_constraint
             )
 
-            try:
-                self.build_model()
-            except UnsolvableModelError:
-                self.is_solvable = False
-            else:
-                self.is_solvable = True
+    @property
+    def is_solvable(self):
+        try:
+            self.build_model()
+        except UnsolvableModelError:
+            return False
+
+        return True
 
     @property
     def added_items(self) -> Tuple:

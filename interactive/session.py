@@ -79,13 +79,16 @@ class Session(object):
             print(e)
             return
 
-        if not self._rp.ranking_problem.is_solvable:
-            self.undo()
-
         if result is not None:
             self.history.append(text)
             if write_history:
                 self.write_history()
+
+            if not self._rp.ranking_problem.is_solvable:
+                self.undo()
+
+                if write_history:
+                    self.write_history()
 
     def write_history(self):
         if not self.log_history:
