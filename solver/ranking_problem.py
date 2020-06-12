@@ -440,9 +440,12 @@ class RankingProblem:
             status = solver.SearchForAllSolutions(self._model, solution_callback)
         else:
             # TODO: give feedback on the status of the model
+            print("Model isn't solvable")
             return list()
 
         result = solution_callback.results
+        if not solution_callback.complete_results:
+            print("Couldn't get complete results - specify more constraints")
 
         if len(result) == 0:
             return None
