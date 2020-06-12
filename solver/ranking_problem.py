@@ -19,6 +19,7 @@ class RankingProblem:
         self._items = tuple()
         self._constraints = list()
         self._nearby = 3
+        self.is_solvable = True
 
     def __add_variable(self, name: str, min_value: int = 0, max_value: int = None):
         """
@@ -81,6 +82,13 @@ class RankingProblem:
             self._constraints.append(
                 new_constraint
             )
+
+            try:
+                self.build_model()
+            except UnsolvableModelError:
+                self.is_solvable = False
+            else:
+                self.is_solvable = True
 
     @property
     def added_items(self) -> Tuple:
@@ -408,39 +416,10 @@ class RankingProblem:
 
         :return:
         """
-        result = []
+        constraint_variables, solver = self.build_model()
 
-        self.__reset_vars()
-        self._model = cp_model.CpModel()
-        number_of_added_item = len(self._variables)
-
-        variables = dict()
-
-        for k, v in self._variables.items():
-            range_min = v[0] if v[0] else 0
-            range_max = v[1] if v[1] else number_of_added_item - 1
-            variables[k] = self._model.NewIntVar(range_min, range_max, k)
-
-        variables[FIRST] = 0
-        variables[LAST] = number_of_added_item - 1
-        variables[NEARBY] = self._nearby
-
-        for c in self._constraints:
-            self._model.Add(eval(c.express("variables['{}']")))
-
-        # exclude positions
-        constraint_variables = [v for k, v in variables.items() if k not in POSITIONS]
-
-        self._model.AddAllDifferent(constraint_variables)
-
-        solver = cp_model.CpSolver()
         solution_callback = RankingSolver(constraint_variables)
-
-        status = solver.Solve(self._model)
-        if status in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
-            status = solver.SearchForAllSolutions(self._model, solution_callback)
-        else:
-            raise UnsolvableModelError("Model is not solvable")
+        solver.SearchForAllSolutions(self._model, solution_callback)
 
         result = solution_callback.results
         if not solution_callback.complete_results:
@@ -452,3 +431,36 @@ class RankingProblem:
         result.sort()
 
         return result
+
+    def build_model(self):
+        constraint_variables = self.build_constraints()
+        solver, is_solvable = self.build_solver()
+        if not is_solvable:
+            raise UnsolvableModelError("Model is not solvable")
+        return constraint_variables, solver
+
+    def build_solver(self):
+        solver = cp_model.CpSolver()
+        status = solver.Solve(self._model)
+        is_solvable = status in [cp_model.OPTIMAL, cp_model.FEASIBLE]
+        return solver, is_solvable
+
+    def build_constraints(self):
+        self.__reset_vars()
+        self._model = cp_model.CpModel()
+        number_of_added_item = len(self._variables)
+        variables = dict()
+        for k, v in self._variables.items():
+            range_min = v[0] if v[0] else 0
+            range_max = v[1] if v[1] else number_of_added_item - 1
+            variables[k] = self._model.NewIntVar(range_min, range_max, k)
+        variables[FIRST] = 0
+        variables[LAST] = number_of_added_item - 1
+        variables[NEARBY] = self._nearby
+        for c in self._constraints:
+            self._model.Add(eval(c.express("variables['{}']")))
+        # exclude positions
+        constraint_variables = [v for k, v in variables.items() if k not in POSITIONS]
+        self._model.AddAllDifferent(constraint_variables)
+
+        return constraint_variables

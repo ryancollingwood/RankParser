@@ -80,6 +80,9 @@ class Session(object):
             print(e)
             return
 
+        if not self._rp.ranking_problem.is_solvable:
+            self.undo()
+
         if result is not None:
             self.history.append(text)
             if write_history:
@@ -134,8 +137,9 @@ class Session(object):
         self.pp.pprint(result)
 
     def undo(self):
-        self._rp.remove_last_constraint()
-        print(self.solve())
+        if len(self.history) > 0:
+            print(f"{STYLE_MAP['ERROR']}Undoing:{STYLE_MAP['RESET']}", self._hl.highlight(self.history[-1]))
+            self._rp.remove_last_constraint()
 
     def print_history(self):
         for h in self.history:
@@ -165,7 +169,7 @@ class Session(object):
         pair = None
 
         try:
-            pair = self._rp.ranking_problem.least_most_common_variable()
+            pair = self._rp.ranking_problem.least_most_common_variable
         except Exception as e:
             print("Couldn't suggest pair", e)
             return
@@ -178,7 +182,7 @@ class Session(object):
             result = self._rp.solve()
         except IncompleteResultsError as e:
             print(f"{STYLE_MAP['ERROR']}{e.message}{Style.NORMAL}{STYLE_MAP['RESET']}")
-            result = e.results
+            #result = e.results
         except UnsolvableModelError as e:
             print(f"{STYLE_MAP['ERROR']}{e.message}{Style.NORMAL}{STYLE_MAP['RESET']}")
 
