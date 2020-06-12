@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 import uuid
 import pprint
 from os import mkdir
