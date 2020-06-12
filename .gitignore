@@ -129,9 +129,9 @@ dmypy.json
 # intermediate output files
 solver/rule_lexer.out
 solver/parsetab.py
-output.txt
-import.txt
-import_items.txt
 
 # dependencies
 graphviz-238/
+
+# txt files
+*.txt
