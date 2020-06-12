@@ -1,5 +1,7 @@
+import pytest
 from solver.ranking_problem import RankingProblem
 from solver.combinations import get_all_combinations
+from solver.exceptions import UnsolvableModelError
 
 
 def test_solve_is_before_fully_specified_correct():
@@ -40,8 +42,8 @@ def test_solve_is_before_unsolvable():
     r.is_before("Cat", "Dog")
     r.is_before("Dog", "Cat")
 
-    actual_results = r.solve()
-    assert(actual_results == unsolvable_results)
+    with pytest.raises(UnsolvableModelError):
+        r.solve()
 
 
 def test_solve_is_before_partially_specified():

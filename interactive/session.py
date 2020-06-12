@@ -6,6 +6,7 @@ from shutil import move, copytree
 from os import path
 from colorama import Style
 from solver import RankingParser, RankingLexer
+from solver import IncompleteResultsError, UnsolvableModelError
 from graph import RankingGraph
 from graph import RankingNetwork
 from interactive import HighLighter
@@ -134,7 +135,7 @@ class Session(object):
 
     def undo(self):
         self._rp.remove_last_constraint()
-        print(self._rp.solve())
+        print(self.solve())
 
     def print_history(self):
         for h in self.history:
@@ -144,7 +145,7 @@ class Session(object):
         self.do_tokenize(s.strip())
 
     def generate_graph(self, filename):
-        solutions = self._rp.solve()
+        solutions = self.solve()
         if len(solutions) == 0:
             print("No solutions to generate a graph from")
             return
@@ -152,7 +153,7 @@ class Session(object):
         generate_viz_from_solutions(solutions, filename)
 
     def export_csv(self, filename):
-        solutions = self._rp.solve()
+        solutions = self.solve()
         if len(solutions) == 0:
             print("No solutions to generate a graph from")
             return
@@ -171,8 +172,20 @@ class Session(object):
 
         print(self._hl.highlight(f"[{pair[0]}] versus [{pair[1]}]"))
 
+    def solve(self):
+        result = list()
+        try:
+            result = self._rp.solve()
+        except IncompleteResultsError as e:
+            print(f"{STYLE_MAP['ERROR']}{e.message}{Style.NORMAL}{STYLE_MAP['RESET']}")
+            result = e.results
+        except UnsolvableModelError as e:
+            print(f"{STYLE_MAP['ERROR']}{e.message}{Style.NORMAL}{STYLE_MAP['RESET']}")
+
+        return result
+
     def print_stats(self, filename = None):
-        solutions = self._rp.solve()
+        solutions = self.solve()
         if len(solutions) == 0:
             print("No solutions to generate a stats from")
             return
@@ -205,7 +218,7 @@ class Session(object):
         text_split = text.split(" ")
 
         if text == "=":
-            result = self._rp.solve()
+            result = self.solve()
             if len(result) == 1:
                 self.pp.pprint(result[0])
             elif len(result) > 1:
@@ -277,8 +290,9 @@ class Session(object):
                 try:
                     self.read_input(text)
                 except Exception as e:
-                    print(f"Error reading input: {text}")
-                    print(e)
+                    print(Style.RESET_ALL)
+                    print(f"{STYLE_MAP['ERROR']}Error reading input: {text}")
+                    print(f"{e}{Style.NORMAL}")
 
 
 if __name__ == "__main__":

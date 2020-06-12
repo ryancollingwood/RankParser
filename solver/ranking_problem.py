@@ -6,6 +6,7 @@ from .constraint_expression import ConstraintExpression
 from .ranking_solver import RankingSolver
 from .positions import FIRST, LAST, NEARBY, POSITIONS
 from .variable_cleansor import clean_variable, fuzzy_match_variable
+from .exceptions import UnsolvableModelError, IncompleteResultsError
 
 
 class RankingProblem:
@@ -439,13 +440,11 @@ class RankingProblem:
         if status in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
             status = solver.SearchForAllSolutions(self._model, solution_callback)
         else:
-            # TODO: give feedback on the status of the model
-            print("Model isn't solvable")
-            return list()
+            raise UnsolvableModelError("Model is not solvable")
 
         result = solution_callback.results
         if not solution_callback.complete_results:
-            print("Couldn't get complete results - specify more constraints")
+            raise IncompleteResultsError(f"Incomplete Results: Got {len(result)} results", result)
 
         if len(result) == 0:
             return None

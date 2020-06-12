@@ -1,5 +1,7 @@
+import pytest
 from solver.ranking_problem import RankingProblem
 from solver.combinations import get_all_combinations
+from solver.exceptions import UnsolvableModelError
 
 
 def test_solve_is_after_fully_specified_correct():
@@ -33,15 +35,13 @@ def test_solve_is_after_fully_specified_incorrect():
 
 
 def test_solve_is_after_unsolvable():
-    unsolvable_results = []
-
     r = RankingProblem()
     r.set_items(["Dog", "Cat"])
     r.is_after("Cat", "Dog")
     r.is_after("Dog", "Cat")
 
-    actual_results = r.solve()
-    assert(actual_results == unsolvable_results)
+    with pytest.raises(UnsolvableModelError):
+        r.solve()
 
 
 def test_solve_is_after_partially_specified():

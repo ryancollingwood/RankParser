@@ -1,6 +1,7 @@
+import pytest
 from solver import RankingParser
 from test_data import programmer_riddle
-
+from solver.exceptions import IncompleteResultsError
 
 def test_can_create_rule_parser():
     rp = RankingParser()
@@ -85,9 +86,8 @@ def test_ranking_parser_whitespace_partial_token_matches_missed_capital():
 
 def test_ranking_parser_parse_statements_no_statements():
     rp = RankingParser()
-    result = rp.parse_statements([])
-
-    assert(result is None)
+    with pytest.raises(IncompleteResultsError):
+        rp.parse_statements([])
 
 
 def test_ranking_parser_parse_add_entity_statements():
