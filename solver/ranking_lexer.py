@@ -1,6 +1,6 @@
 from typing import List
-
 from ply import lex
+from .exceptions import ParsingError
 
 """
 Taking 'inspiration' from https://github.com/kmanley/redisql/blob/master/sqlparser.py
@@ -71,7 +71,7 @@ class RankingLexer(object):
         return t
 
     def t_error(self, t):
-        raise TypeError("Unknown text '%s'" % (t.value,))
+        raise ParsingError("Unknown text '%s'" % (t.value,))
 
     def build(self, **kwargs):
         self.lexer = lex.lex(module=self, **kwargs)

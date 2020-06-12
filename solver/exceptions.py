@@ -9,3 +9,9 @@ class IncompleteResultsError(Exception):
         super().__init__(message)
         self.message = message
         self.results = results
+
+
+class ParsingError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message

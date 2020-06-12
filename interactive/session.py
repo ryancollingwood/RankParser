@@ -5,7 +5,7 @@ from shutil import move, copytree
 from os import path
 from colorama import Style
 from solver import RankingParser, RankingLexer
-from solver import IncompleteResultsError, UnsolvableModelError
+from solver import IncompleteResultsError, UnsolvableModelError, ParsingError
 from graph import RankingGraph
 from graph import RankingNetwork
 from interactive import HighLighter
@@ -75,8 +75,8 @@ class Session(object):
 
         try:
             result = self._rp.parse(text)
-        except TypeError as e:
-            print(e)
+        except ParsingError as e:
+            print(STYLE_MAP["ERROR"], f"ERROR: {e}", STYLE_MAP["RESET"])
             return
 
         if result is not None:
