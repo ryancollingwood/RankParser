@@ -52,17 +52,20 @@ def where_dot():
     return result
 
 
-# os.environ["PATH"] += os.pathsep + path
+def setup_dot():
+    install_path = where_dot()
 
-install_path = where_dot()
-
-if install_path is None:
-    print(f"Graphviz not found on path - will be downloaded to: {INSTALL_TO_DIRECTORY}")
-    download_graphviz(WIN_GRAPHVIZ_URL, DESTINATION_FILE)
-    extract_zip(DESTINATION_FILE, INSTALL_TO_DIRECTORY)
-    print("Setting Environment Variable")
-    os.environ["PATH"] += os.pathsep + DOT_PATH
-else:
-    if install_path not in os.environ["PATH"]:
+    if install_path is None:
+        print(f"Graphviz not found on path - will be downloaded to: {INSTALL_TO_DIRECTORY}")
+        download_graphviz(WIN_GRAPHVIZ_URL, DESTINATION_FILE)
+        extract_zip(DESTINATION_FILE, INSTALL_TO_DIRECTORY)
         print("Setting Environment Variable")
-        os.environ["PATH"] += os.pathsep + install_path
+        os.environ["PATH"] += os.pathsep + DOT_PATH
+    else:
+        if install_path not in os.environ["PATH"]:
+            print("Setting Environment Variable")
+            os.environ["PATH"] += os.pathsep + install_path
+
+
+if __name__ == "__main__":
+    setup_dot()

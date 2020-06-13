@@ -62,4 +62,10 @@ def digraph_to_dot_viz(
         with open(output_dot_viz, "w") as f:
             f.write(str(a_graph))
 
+    try:
+        a_graph.write_png(output_dot_viz.split(".")[0]+".png")
+        a_graph.write_svg(output_dot_viz.split(".")[0] + ".svg")
+    except:
+        pass
+
     return a_graph

@@ -6,4 +6,6 @@ from .export import export_highlighted_path
 from .generate_viz import generate_viz_from_statements
 from .generate_viz import generate_viz_from_solutions
 from .graph_analytics import stats_from_solutions
+from .setup_dot import setup_dot
+
 

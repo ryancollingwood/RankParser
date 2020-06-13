@@ -8,6 +8,7 @@ from solver import RankingParser, RankingLexer
 from solver import IncompleteResultsError, UnsolvableModelError, ParsingError
 from graph import RankingGraph
 from graph import RankingNetwork
+from graph import setup_dot
 from interactive import HighLighter
 from interactive import STYLE_MAP
 from graph import generate_viz_from_solutions, export_csv, stats_from_solutions, export_highlighted_path
@@ -158,6 +159,11 @@ class Session(object):
         if len(solutions) == 0:
             print("No solutions to generate a graph from")
             return
+
+        try:
+            setup_dot()
+        except:
+            pass
 
         generate_viz_from_solutions(solutions, filename)
 
