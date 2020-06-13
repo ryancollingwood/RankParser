@@ -37,3 +37,4 @@ def generate_viz_from_solutions(
         output_dot_viz,
         max_pen_width = max_pen_width
     )
+

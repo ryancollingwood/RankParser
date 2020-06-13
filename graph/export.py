@@ -14,3 +14,9 @@ def export_csv(solutions: List[Tuple[str]], output_filename: str):
     )
 
 
+def export_highlighted_path(solutions):
+    rg = RankingGraph(solutions)
+    rn = RankingNetwork()
+    rn = rn.build_from_ranking_graph(rg, True)
+
+    return rn.distill_highlight_path()

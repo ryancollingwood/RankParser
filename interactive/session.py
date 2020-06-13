@@ -10,7 +10,7 @@ from graph import RankingGraph
 from graph import RankingNetwork
 from interactive import HighLighter
 from interactive import STYLE_MAP
-from graph import generate_viz_from_solutions, export_csv, stats_from_solutions
+from graph import generate_viz_from_solutions, export_csv, stats_from_solutions, export_highlighted_path
 from input_output import export_lines_to_text, import_text_to_lines, check_file_extension
 from .help import commands
 from .printout import printout
@@ -223,15 +223,22 @@ class Session(object):
             print()
         print(Style.RESET_ALL)
 
+    def display_solution(self):
+        result = self.solve()
+        if len(result) == 1:
+            self.pp.pprint(result[0])
+        elif len(result) < 5:
+            self.pp.pprint(result)
+        else:
+            print(f"{STYLE_MAP['INFO']}More than 5 results showing the path(s) with most support{STYLE_MAP['RESET']}")
+            highlight_path = export_highlighted_path(result)
+            self.pp.pprint(highlight_path)
+
     def read_input(self, text):
         text_split = text.split(" ")
 
         if text == "=":
-            result = self.solve()
-            if len(result) == 1:
-                self.pp.pprint(result[0])
-            elif len(result) > 1:
-                self.pp.pprint(result)
+            self.display_solution()
         elif text == "undo":
             self.undo()
         elif text == "history":
