@@ -64,8 +64,11 @@ class Session(object):
             self.load_history(project_id)
 
     def file_in_project(self, filename, extension = "txt"):
-        output_filename = check_file_extension(filename, extension)
-        return f"{self.project_id}/{output_filename}"
+        result = check_file_extension(filename, extension)
+        if result[:len(self.project_id)] != self.project_id:
+            result = f"{self.project_id}/{result}"
+
+        return result
 
     def do_parse(self, text, write_history = True):
         if text.strip() == "":
