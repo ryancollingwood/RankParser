@@ -19,3 +19,7 @@ class ConstraintExpression:
                 variable_items.append(decorator.format(item))
 
         return self.expression.format(*variable_items)
+
+    def __contains__(self, item):
+        return item in self.items
+

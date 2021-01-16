@@ -411,6 +411,28 @@ class RankingProblem:
 
         return self
 
+    def remove_item_constraints(self, item: str):
+        """
+        remove all of the constraints applied to the passed item
+        """
+
+        """
+            new_item = self.match_variable(item)
+
+                if new_item not in self._items:
+        """
+        remove_item = self.match_variable(item)
+
+        remove_indexes = list()
+        for i, constraint in enumerate(self._constraints):
+            if remove_item in constraint:
+                remove_indexes.append(i)
+
+        remove_indexes.reverse()
+
+        for i in remove_indexes:
+            del self._constraints[i]
+
     def solve(self) -> List[Tuple[str]]:
         """
         Solve the constraints and return the results.

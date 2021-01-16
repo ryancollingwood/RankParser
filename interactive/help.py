@@ -2,6 +2,7 @@ commands = {
     "+": ("Add an item: +<Item>", "+Ryan",),
     "-": ("Remove an item: - <Item>", "-Ryan"),
     "=": ("Solve and display results", "="),
+    "\\": ("Unlink an item from all other items", "\\ Ryan"),
     "~": ("Suggest a pair of items for constraint specification.", "~"),
     "?": ("Debug the input, displaying how it will be tokenised: ? <statement>", "? Breakfast before Dinner"),
     "history": ("Display the history of submitted statements", "history"),

@@ -75,6 +75,7 @@ class RankingParser(object):
                   | is_near_after_statement
                   | add_item_statement
                   | remove_item_statement
+                  | unlink_item_statement
         """
         p[0] = p[1]
 
@@ -200,6 +201,13 @@ class RankingParser(object):
         """
         self._rank_prob.remove_item(p[2])
         # p[0] = self._rank_prob.solve()
+        p[0] = True
+
+    def p_unlink_item_statement(self, p):
+        """
+        unlink_item_statement : UNLINK entity_list
+        """
+        self._rank_prob.remove_item_constraints(p[2])
         p[0] = True
 
     def build(self, **kwargs):

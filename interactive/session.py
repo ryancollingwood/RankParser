@@ -225,7 +225,11 @@ class Session(object):
         for key in commands:
             print(Style.RESET_ALL)
             print(f"{Style.BRIGHT}{key}{Style.NORMAL} : {commands[key][0]}")
-            command_example = self._hl.highlight(commands[key][1])
+            try:
+                command_example = self._hl.highlight(commands[key][1])
+            except ParsingError as e:
+                command_example = commands[key][1]
+
             print(f"{Style.DIM}{command_example}{Style.NORMAL}")
             print()
         print(Style.RESET_ALL)
