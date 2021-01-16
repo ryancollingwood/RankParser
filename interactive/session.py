@@ -22,7 +22,7 @@ from .printout import printout
 
 class Session(object):
 
-    def __init__(self, project_id = None, log_history = True):
+    def __init__(self, project_id=None, log_history=True):
         self.generated_project = True
         self.log_history = log_history
         self.project_id = None
@@ -49,7 +49,7 @@ class Session(object):
         else:
             self.project_id = str(uuid.uuid1())
 
-    def change_project_id(self, project_id, move_files = True):
+    def change_project_id(self, project_id, move_files=True):
         if self.project_id == project_id:
             return
 
@@ -74,14 +74,14 @@ class Session(object):
             self.set_project_id(project_id)
             self.load_history(project_id)
 
-    def file_in_project(self, filename, extension = "txt"):
+    def file_in_project(self, filename, extension="txt"):
         result = check_file_extension(filename, extension)
         if result[:len(self.project_id)] != self.project_id:
             result = f"{self.project_id}/{result}"
 
         return result
 
-    def do_parse(self, text, write_history = True):
+    def do_parse(self, text, write_history=True):
         if text.strip() == "":
             return
 
@@ -129,7 +129,7 @@ class Session(object):
         self.history.clear()
 
         for l in lines:
-            self.do_parse(l, write_history= False)
+            self.do_parse(l, write_history=False)
 
     def import_items(self, file_name):
         lines = import_text_to_lines(file_name)
@@ -198,13 +198,13 @@ class Session(object):
             result = self._rp.solve()
         except IncompleteResultsError as e:
             print(f"{STYLE_MAP['ERROR']}{e.message}{Style.NORMAL}{STYLE_MAP['RESET']}")
-            #result = e.results
+            # result = e.results
         except UnsolvableModelError as e:
             print(f"{STYLE_MAP['ERROR']}{e.message}{Style.NORMAL}{STYLE_MAP['RESET']}")
 
         return result
 
-    def print_stats(self, filename = None):
+    def print_stats(self, filename=None):
         solutions = self.solve()
         if len(solutions) == 0:
             print("No solutions to generate a stats from")
@@ -311,7 +311,10 @@ class Session(object):
             if not self.generated_project:
                 prompt = f"{self.project_id}>"
 
-            text = prompt_session.prompt(prompt, auto_suggest=AutoSuggestFromHistory(), completer=word_completer)
+            text = prompt_session.prompt(
+                prompt, auto_suggest=AutoSuggestFromHistory(), completer=word_completer, complete_in_thread=True
+            )
+
             if text.lower() == "quit":
                 break
 
