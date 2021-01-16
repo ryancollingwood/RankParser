@@ -24,6 +24,7 @@ class RankingLexer(object):
         'REMOVE',
         'NEWLINE',
         'NEAR',
+        'UNLINK',
     )
 
     # ignore whitespace and tabs
@@ -40,6 +41,7 @@ class RankingLexer(object):
     t_ADD = r'\+'
     t_REMOVE = r'\-'
     t_NEAR = r'(near(by|ly|\-by)?|just|close)'
+    t_UNLINK = r'(unlink|\/)'
 
     # to support greedy entity accumulation create a look-ahead
     # regex of words that cannot be part of a run on entity
