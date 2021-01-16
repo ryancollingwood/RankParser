@@ -4,6 +4,10 @@ from os import mkdir
 from shutil import move, copytree
 from os import path
 from colorama import Style
+from prompt_toolkit import PromptSession
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.completion import WordCompleter
+
 from solver import RankingParser, RankingLexer
 from solver import IncompleteResultsError, UnsolvableModelError, ParsingError
 from graph import RankingGraph
@@ -293,12 +297,15 @@ class Session(object):
     def start(self):
         self._rp.build()
 
+        prompt_session = PromptSession()
+        word_completer = WordCompleter(self._rp.items, ignore_case=True)
+
         while True:
             prompt = "RankParser>"
             if not self.generated_project:
                 prompt = f"{self.project_id}>"
 
-            text = input(prompt).strip()
+            text = prompt_session.prompt(prompt, auto_suggest=AutoSuggestFromHistory(), completer=word_completer)
             if text.lower() == "quit":
                 break
 
@@ -309,6 +316,8 @@ class Session(object):
                     print(Style.RESET_ALL)
                     print(f"{STYLE_MAP['ERROR']}Error reading input: {text}")
                     print(f"{e}{Style.NORMAL}")
+                else:
+                    word_completer.words = self._rp.items
 
 
 if __name__ == "__main__":
