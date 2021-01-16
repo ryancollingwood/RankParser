@@ -23,15 +23,20 @@ class Session(object):
         self.log_history = log_history
         self.project_id = None
         self.set_project_id(project_id)
-        self._rp = RankingParser()
+        self._rp = None
+        self.reset_ranking_parser()
         self._rl = RankingLexer()
         self._rg = RankingGraph()
         self._rn = RankingNetwork()
         self.lexer = self._rl.build()
-        self._rp.build()
+
         self._hl = HighLighter(self._rl, STYLE_MAP)
         self.history = list()
         self.pp = pprint.PrettyPrinter(indent=4)
+
+    def reset_ranking_parser(self):
+        self._rp = RankingParser()
+        self._rp.build()
 
     def set_project_id(self, project_id):
         if project_id is not None:
@@ -59,6 +64,8 @@ class Session(object):
             self.generated_project = False
             self.set_project_id(project_id)
         else:
+            self.reset_ranking_parser()
+
             self.generated_project = False
             self.set_project_id(project_id)
             self.load_history(project_id)
@@ -291,7 +298,6 @@ class Session(object):
             self.do_parse(text)
 
     def start(self):
-        self._rp.build()
 
         while True:
             prompt = "RankParser>"
