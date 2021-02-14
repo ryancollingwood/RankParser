@@ -5,7 +5,7 @@ from .ranking_viz import digraph_to_dot_viz
 
 class RankingNetwork(object):
     def __init__(self, ranking_graph: RankingGraph = None):
-        self._G = nx.DiGraph()
+        self._G = nx.DiGraph(incoming_graph_data = None, concentrate="true")
         self.weighted_paths = dict()
 
         self.start_nodes = list()
@@ -183,8 +183,14 @@ class RankingNetwork(object):
 
         return result
 
+    def shortest_paths(self, highlight_paths):
+        return nx.all_shortest_paths(self._G, highlight_paths[0][0], highlight_paths[0][-1])
+
     def to_dot_viz(self, filename: str, max_pen_width: int = 12):
         highlight_paths = self.distill_highlight_path()
+        shortest_paths = self.shortest_paths(highlight_paths)
+        for path in shortest_paths:
+            print(path)
 
         return digraph_to_dot_viz(
             self._G,

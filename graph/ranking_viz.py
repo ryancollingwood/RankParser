@@ -49,14 +49,34 @@ def digraph_to_dot_viz(
         data["label"] = node[0].replace("_", " ").strip()
         data["fillcolor"] = color_gradient[int(data["position"])].hex_l
 
+    print(highlight_paths)
+
     edges = dg.edges(data=True)
     for path in highlight_paths:
         for i in range(len(path) - 1):
-            matching_steps = [x for x in edges if x[0] == path[i] and x[1] == path[i + 1]]
+            
+            # get bidirectional matches
+            matching_steps = [x for x in edges if x[0] == path[i] and x[1] == path[i + 1]] + \
+                [x for x in edges if x[0] == path[i+1] and x[1] == path[i]]
+            
+            max_pen_width = 0
             for match_edge in matching_steps:
                 match_edge[2]["color"] = highlight_color
+                if match_edge[2]["penwidth"] > max_pen_width:
+                    max_pen_width = match_edge[2]["penwidth"]
 
+            for match_edge in matching_steps:
+                match_edge[2]["penwidth"] = max_pen_width
+
+    # seems like the graph attributes set on
+    # networkx Graph don't get set on 
+    # the returned pydot 
+    # there is an issue on the networkX repo seems related
+    # https://github.com/networkx/networkx/issues/3547
+    # however concatenating removes any additional styling 
+    # differences between merged paths :/
     a_graph = nx_pydot.to_pydot(dg)
+    a_graph.obj_dict['attributes'] = {"concentrate": "true"}
 
     if output_dot_viz is not None:
         with open(output_dot_viz, "w") as f:
