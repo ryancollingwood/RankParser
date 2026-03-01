@@ -1,4 +1,4 @@
-from fuzzywuzzy import process
+from thefuzz import process
 from copy import copy
 from typing import Tuple
 
