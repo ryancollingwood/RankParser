@@ -23,7 +23,7 @@ class RankingSolver(cp_model.CpSolverSolutionCallback):
         self.__solution_count += 1
         callback_result = dict()
         for v in self.__variables:
-            v_name = v._IntVar__var.name
+            v_name = v.Name()
             if v_name in POSITIONS:
                 continue
             callback_result[self.Value(v)] = v_name
