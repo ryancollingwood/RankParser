@@ -41,7 +41,7 @@ class RankingProblem:
         if name in self._variables:
             del self._variables[name]
 
-        # TODO remove from constraints where items in name
+        self._constraints = [x for x in self._constraints if name not in x]
 
     def __add_variables(self, names, min_value = 0, max_value = None):
         for name in names:
