@@ -1,20 +1,20 @@
-def distance_between(a, b):
+def distance_between(a: int, b: int) -> int:
     return b - a
 
 
-def is_equal(a: int, b: int):
+def is_equal(a: int, b: int) -> bool:
     return distance_between(a, b) == 0
 
 
-def not_equal(a: int, b: int):
+def not_equal(a: int, b: int) -> bool:
     return not is_equal(a, b)
 
 
-def is_before(a: int, b: int):
+def is_before(a: int, b: int) -> bool:
     return distance_between(a, b) > 0
 
 
-def is_just_before(a: int, b: int, max_distance: int):
+def is_just_before(a: int, b: int, max_distance: int) -> bool:
 
     if is_before(a, b):
         distance = distance_between(a, b)
@@ -23,13 +23,13 @@ def is_just_before(a: int, b: int, max_distance: int):
     return False
 
 
-def is_after(a: int, b: int):
+def is_after(a: int, b: int) -> bool:
     if a == b:
         return False
     return not is_before(a, b)
 
 
-def is_just_after(a: int, b: int, max_distance: int):
+def is_just_after(a: int, b: int, max_distance: int) -> bool:
     if is_after(a, b):
         distance = distance_between(a, b)
         return abs(distance) <= max_distance
@@ -37,23 +37,23 @@ def is_just_after(a: int, b: int, max_distance: int):
     return False
 
 
-def is_within_range(a: int, b: int, max_distance: int):
+def is_within_range(a: int, b: int, max_distance: int) -> bool:
     return abs(distance_between(a, b)) <= max_distance
 
 
-def directly_before(a: int, b: int):
+def directly_before(a: int, b: int) -> bool:
     distance = distance_between(a, b)
     return distance == 1
 
 
-def directly_after(a: int, b: int):
+def directly_after(a: int, b: int) -> bool:
     distance = distance_between(a, b)
     return distance == -1
 
 
-def not_directly_before(a: int, b: int):
+def not_directly_before(a: int, b: int) -> bool:
     return not directly_before(a, b)
 
 
-def not_directly_after(a: int, b: int):
+def not_directly_after(a: int, b: int) -> bool:
     return not directly_after(a, b)
