@@ -125,12 +125,8 @@ class RankingProblem:
         :return: Dictionary of variable names with the number
             of constraints it participate in
         """
-        result = self.item_links
-        for item in result:
-            result[item] = len(result[item])
-
         # return the result sorted by count
-        return {k: v for k, v in sorted(result.items(), key=lambda sort_item: sort_item[1])}
+        return {k: len(v) for k, v in self.item_links.items()}
 
     @property
     def specified_constraints(self):
