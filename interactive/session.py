@@ -22,7 +22,7 @@ from .printout import printout
 
 class Session(object):
 
-    def __init__(self, project_id=None, log_history=True):
+    def __init__(self, project_id: str = None, log_history: bool = True) -> None:
         self.generated_project = True
         self.log_history = log_history
         self.project_id = None
@@ -38,18 +38,18 @@ class Session(object):
         self.history = list()
         self.pp = pprint.PrettyPrinter(indent=4)
 
-    def reset_ranking_parser(self):
+    def reset_ranking_parser(self) -> None:
         self._rp = RankingParser()
         self._rp.build()
 
-    def set_project_id(self, project_id):
+    def set_project_id(self, project_id: str) -> None:
         if project_id is not None:
             self.generated_project = False
             self.project_id = project_id
         else:
             self.project_id = str(uuid.uuid1())
 
-    def change_project_id(self, project_id, move_files=True):
+    def change_project_id(self, project_id: str, move_files: bool = True) -> None:
         if self.project_id == project_id:
             return
 
@@ -74,14 +74,14 @@ class Session(object):
             self.set_project_id(project_id)
             self.load_history(project_id)
 
-    def file_in_project(self, filename, extension="txt"):
+    def file_in_project(self, filename: str, extension: str = "txt") -> str:
         result = check_file_extension(filename, extension)
         if result[:len(self.project_id)] != self.project_id:
             result = f"{self.project_id}/{result}"
 
         return result
 
-    def do_parse(self, text, write_history=True):
+    def do_parse(self, text: str, write_history: bool = True) -> None:
         if text.strip() == "":
             return
 
@@ -104,7 +104,7 @@ class Session(object):
                 if write_history:
                     self.write_history()
 
-    def write_history(self):
+    def write_history(self) -> None:
         if not self.log_history:
             return
 
@@ -118,7 +118,7 @@ class Session(object):
         except:
             pass
 
-    def load_history(self, project_id):
+    def load_history(self, project_id: str) -> None:
         file_name = f"{project_id}/output.txt"
         lines = import_text_to_lines(file_name)
 
@@ -131,7 +131,7 @@ class Session(object):
         for l in lines:
             self.do_parse(l, write_history=False)
 
-    def import_items(self, file_name):
+    def import_items(self, file_name: str) -> None:
         lines = import_text_to_lines(file_name)
 
         if len(lines) == 0:
@@ -143,28 +143,28 @@ class Session(object):
 
         print("imported items")
 
-    def export_items(self, file_name):
+    def export_items(self, file_name: str) -> None:
         output_file_name = self.file_in_project(file_name, "txt")
         export_lines_to_text(self._rp.items, output_file_name)
         print(f"exported items to {output_file_name}")
 
-    def do_tokenize(self, text):
+    def do_tokenize(self, text: str) -> None:
         result = self._rl.tokenize(text.strip())
         self.pp.pprint(result)
 
-    def undo(self):
+    def undo(self) -> None:
         if len(self.history) > 0:
             print(f"{STYLE_MAP['ERROR']}Undoing:{STYLE_MAP['RESET']}", self._hl.highlight(self.history[-1]))
             self._rp.remove_last_constraint()
 
-    def print_history(self):
+    def print_history(self) -> None:
         for h in self.history:
             print(self._hl.highlight(h))
 
-    def print_token_debug(self, s):
+    def print_token_debug(self, s: str) -> None:
         self.do_tokenize(s.strip())
 
-    def generate_graph(self, filename):
+    def generate_graph(self, filename: str) -> None:
         solutions = self.solve()
         if len(solutions) == 0:
             print("No solutions to generate a graph from")
@@ -172,7 +172,7 @@ class Session(object):
 
         generate_viz_from_solutions(solutions, filename)
 
-    def export_csv(self, filename):
+    def export_csv(self, filename: str) -> None:
         solutions = self.solve()
         if len(solutions) == 0:
             print("No solutions to generate a graph from")
@@ -181,7 +181,7 @@ class Session(object):
         output_filename = self.file_in_project(filename, "csv")
         export_csv(solutions, output_filename)
 
-    def suggest_pair(self):
+    def suggest_pair(self) -> None:
         pair = None
 
         try:
@@ -192,7 +192,7 @@ class Session(object):
 
         print(self._hl.highlight(f"[{pair[0]}] versus [{pair[1]}]"))
 
-    def solve(self):
+    def solve(self) -> list:
         result = list()
         try:
             result = self._rp.solve()
@@ -204,7 +204,7 @@ class Session(object):
 
         return result
 
-    def print_stats(self, filename=None):
+    def print_stats(self, filename: str = None) -> None:
         solutions = self.solve()
         if len(solutions) == 0:
             print("No solutions to generate a stats from")
@@ -225,7 +225,7 @@ class Session(object):
                 lines.append(f"{key}={result[key]}")
             export_lines_to_text(lines, self.file_in_project(filename))
 
-    def display_commands(self):
+    def display_commands(self) -> None:
         for key in commands:
             print(Style.RESET_ALL)
             print(f"{Style.BRIGHT}{key}{Style.NORMAL} : {commands[key][0]}")
@@ -238,7 +238,7 @@ class Session(object):
             print()
         print(Style.RESET_ALL)
 
-    def display_solution(self):
+    def display_solution(self) -> None:
         result = self.solve()
         if len(result) == 1:
             self.pp.pprint(result[0])
@@ -249,7 +249,7 @@ class Session(object):
             highlight_path = export_highlighted_path(result)
             self.pp.pprint(highlight_path)
 
-    def read_input(self, text):
+    def read_input(self, text: str) -> None:
         text_split = text.split(" ")
 
         if text == "=":
@@ -305,7 +305,7 @@ class Session(object):
         else:
             self.do_parse(text)
 
-    def start(self):
+    def start(self) -> None:
 
         prompt_session = PromptSession()
         word_completer = WordCompleter(self._rp.items, ignore_case=True)

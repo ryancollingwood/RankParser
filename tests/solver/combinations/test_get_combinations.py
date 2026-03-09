@@ -51,5 +51,5 @@ def test_get_all_combinations_excluding_supplied_incorrect():
     actual_results = get_all_combinations(["Red", "Blue"], False)
 
     for unexpected_item in unexpected_results:
-        with pytest.raises(ValueError, match=r".*is not in list"):
+        with pytest.raises(ValueError, match=r".* not in list"):
             actual_results.index(unexpected_item)

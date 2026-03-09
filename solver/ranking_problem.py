@@ -11,7 +11,7 @@ from .exceptions import UnsolvableModelError, IncompleteResultsError
 
 class RankingProblem:
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._model = cp_model.CpModel()
         self._results = list()
@@ -20,7 +20,7 @@ class RankingProblem:
         self._constraints = list()
         self._nearby = 3
 
-    def __add_variable(self, name: str, min_value: int = 0, max_value: int = None):
+    def __add_variable(self, name: str, min_value: int = 0, max_value: int = None) -> None:
         """
         Add a variable, with the given range.
 
@@ -31,7 +31,7 @@ class RankingProblem:
         """
         self._variables[name] = (min_value, max_value)
 
-    def __remove_variable(self, name: str):
+    def __remove_variable(self, name: str) -> None:
         """
         Remove the given variable if present.
 
@@ -41,13 +41,13 @@ class RankingProblem:
         if name in self._variables:
             del self._variables[name]
 
-        # TODO remove from constraints where items in name
+        self._constraints = [x for x in self._constraints if name not in x]
 
-    def __add_variables(self, names, min_value = 0, max_value = None):
+    def __add_variables(self, names: list, min_value: int = 0, max_value: int = None) -> None:
         for name in names:
             self.__add_variable(name, min_value, max_value)
 
-    def __reset_vars(self):
+    def __reset_vars(self) -> None:
         """
         Reset the state of derived variables such as the `nearby_value`
 
@@ -61,7 +61,7 @@ class RankingProblem:
             nearby_value = round(stdev(range(number_of_added_item)))
             self._nearby = nearby_value
 
-    def __add_rank_constraint(self, comparison: str, *items):
+    def __add_rank_constraint(self, comparison: str, *items) -> None:
         """
         Create a constraint expression to be applied when solving.
 
@@ -83,7 +83,7 @@ class RankingProblem:
             )
 
     @property
-    def is_solvable(self):
+    def is_solvable(self) -> bool:
         try:
             self.build_model()
         except UnsolvableModelError:
@@ -110,7 +110,7 @@ class RankingProblem:
         return len(self._items)
 
     @property
-    def number_of_constraints(self):
+    def number_of_constraints(self) -> int:
         """
         How many constraints have been specified
         :return:
@@ -129,7 +129,7 @@ class RankingProblem:
         return {k: len(v) for k, v in self.item_links.items()}
 
     @property
-    def specified_constraints(self):
+    def specified_constraints(self) -> List[ConstraintExpression]:
         return [x for x in self._constraints]
 
     @property
@@ -202,7 +202,7 @@ class RankingProblem:
         """
         return self._variables[variable_name]
 
-    def set_items(self, items: list):
+    def set_items(self, items: list) -> 'RankingProblem':
         """
         If no items have already been set, set the items to way is passed in.
         If items have already been set, a ValueError will be raised.
@@ -235,7 +235,7 @@ class RankingProblem:
             return fuzzy_match_variable(item, tuple(self._variables.keys()))
         return item
 
-    def add_item(self, item: str):
+    def add_item(self, item: str) -> 'RankingProblem':
         """
         Add the given item (if not present or having a fuzzy match)
         to the variables.
@@ -251,7 +251,7 @@ class RankingProblem:
 
         return self
 
-    def remove_item(self, item: str):
+    def remove_item(self, item: str) -> 'RankingProblem':
         """
         Remove the given item (if present or having a fuzzy match)
         from the variables.
@@ -292,7 +292,7 @@ class RankingProblem:
             raise ValueError(f"{item} not in Items")
         return True
 
-    def not_equal(self, a: str, b: str):
+    def not_equal(self, a: str, b: str) -> 'RankingProblem':
         self.__add_rank_constraint(
             "{} != {}",
             a, b,
@@ -300,7 +300,7 @@ class RankingProblem:
 
         return self
 
-    def is_equal(self, a: str, b: str):
+    def is_equal(self, a: str, b: str) -> 'RankingProblem':
         self.__add_rank_constraint(
             "{} == {}",
             a, b,
@@ -308,27 +308,27 @@ class RankingProblem:
 
         return self
 
-    def not_last(self, item: str):
+    def not_last(self, item: str) -> 'RankingProblem':
         self.not_equal(item, LAST)
 
         return self
 
-    def is_last(self, item: str):
+    def is_last(self, item: str) -> 'RankingProblem':
         self.is_equal(item, LAST)
 
         return self
 
-    def not_first(self, item: str):
+    def not_first(self, item: str) -> 'RankingProblem':
         self.not_equal(item, FIRST)
 
         return self
 
-    def is_first(self, item: str):
+    def is_first(self, item: str) -> 'RankingProblem':
         self.is_equal(item, FIRST)
 
         return self
 
-    def not_directly_before_or_after(self, a: str, b: str):
+    def not_directly_before_or_after(self, a: str, b: str) -> 'RankingProblem':
         self.__add_rank_constraint(
             "{} != {} - 1",
             a, b
@@ -341,7 +341,7 @@ class RankingProblem:
 
         return self
 
-    def is_before(self, a: str, b: str):
+    def is_before(self, a: str, b: str) -> 'RankingProblem':
         self.__add_rank_constraint(
             "{} < {}",
             a, b
@@ -349,7 +349,7 @@ class RankingProblem:
 
         return self
 
-    def is_after(self, a: str, b: str):
+    def is_after(self, a: str, b: str) -> 'RankingProblem':
         self.__add_rank_constraint(
             "{} > {}",
             a, b
@@ -357,7 +357,7 @@ class RankingProblem:
 
         return self
 
-    def is_just_before(self, a: int, b: int):
+    def is_just_before(self, a: str, b: str) -> 'RankingProblem':
         self.__add_rank_constraint(
             "{} >= {} - {}",
             a, b, NEARBY
@@ -369,7 +369,7 @@ class RankingProblem:
         )
         return self
 
-    def is_just_after(self, a: int, b: int):
+    def is_just_after(self, a: str, b: str) -> 'RankingProblem':
         self.__add_rank_constraint(
             "{} <= {} + {}",
             a, b, NEARBY
@@ -382,7 +382,7 @@ class RankingProblem:
 
         return self
 
-    def is_nearby(self, a: int, b: int):
+    def is_nearby(self, a: str, b: str) -> 'RankingProblem':
 
         self.__add_rank_constraint(
             "{} >= {} - {}",
@@ -396,7 +396,7 @@ class RankingProblem:
 
         return self
 
-    def remove_last_constraint(self):
+    def remove_last_constraint(self) -> 'RankingProblem':
         """
         Remove the most recently added constraint
 
@@ -407,7 +407,7 @@ class RankingProblem:
 
         return self
 
-    def remove_item_constraints(self, item: str):
+    def remove_item_constraints(self, item: str) -> None:
         """
         remove all of the constraints applied to the passed item
         """
@@ -451,20 +451,20 @@ class RankingProblem:
 
         return result
 
-    def build_model(self):
+    def build_model(self) -> Tuple[list, cp_model.CpSolver]:
         constraint_variables = self.build_constraints()
         solver, is_solvable = self.build_solver()
         if not is_solvable:
             raise UnsolvableModelError("Model is not solvable")
         return constraint_variables, solver
 
-    def build_solver(self):
+    def build_solver(self) -> Tuple[cp_model.CpSolver, bool]:
         solver = cp_model.CpSolver()
         status = solver.Solve(self._model)
         is_solvable = status in [cp_model.OPTIMAL, cp_model.FEASIBLE]
         return solver, is_solvable
 
-    def build_constraints(self):
+    def build_constraints(self) -> list:
         self.__reset_vars()
         self._model = cp_model.CpModel()
         number_of_added_item = len(self._variables)

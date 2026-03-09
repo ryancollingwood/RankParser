@@ -1,9 +1,9 @@
-from fuzzywuzzy import process
+from thefuzz import process
 from copy import copy
 from typing import Tuple
 
 
-def clean_variable(item: str):
+def clean_variable(item: str) -> str:
     new_item = copy(item)
     return new_item.replace("[", "").replace("]", "").strip().replace(" ", "_")
 
@@ -12,7 +12,7 @@ def fuzzy_match_variable(
         item: str,
         existing_items: Tuple,
         tolerance: int = 90
-):
+) -> str:
     if len(existing_items) == 0:
         return clean_variable(item)
 
