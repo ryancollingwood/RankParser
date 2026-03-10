@@ -1,21 +1,14 @@
-import uuid
 import pprint
-from os import mkdir
-from shutil import move, copytree
-from os import path
 from colorama import Style
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import WordCompleter
 
-from solver import RankingParser, RankingLexer
 from solver import IncompleteResultsError, UnsolvableModelError, ParsingError
-from graph import RankingGraph
-from graph import RankingNetwork
-from interactive import HighLighter
-from interactive import STYLE_MAP
-from graph import generate_viz_from_solutions, export_csv, stats_from_solutions, export_highlighted_path
-from input_output import export_lines_to_text, import_text_to_lines, check_file_extension
+from interactive.highlight import HighLighter
+from interactive.style_map import STYLE_MAP
+from interactive.core import RankParserCore
+from graph import export_highlighted_path
 from .help import commands
 from .printout import printout
 
@@ -23,63 +16,20 @@ from .printout import printout
 class Session(object):
 
     def __init__(self, project_id: str = None, log_history: bool = True) -> None:
-        self.generated_project = True
-        self.log_history = log_history
-        self.project_id = None
-        self.set_project_id(project_id)
-        self._rp = None
-        self.reset_ranking_parser()
-        self._rl = RankingLexer()
-        self._rg = RankingGraph()
-        self._rn = RankingNetwork()
-        self.lexer = self._rl.build()
-
-        self._hl = HighLighter(self._rl, STYLE_MAP)
-        self.history = list()
+        self.core = RankParserCore(project_id, log_history)
+        self._hl = HighLighter(self.core._rl, STYLE_MAP)
         self.pp = pprint.PrettyPrinter(indent=4)
 
-    def reset_ranking_parser(self) -> None:
-        self._rp = RankingParser()
-        self._rp.build()
+    @property
+    def project_id(self):
+        return self.core.project_id
 
-    def set_project_id(self, project_id: str) -> None:
-        if project_id is not None:
-            self.generated_project = False
-            self.project_id = project_id
-        else:
-            self.project_id = str(uuid.uuid1())
+    @property
+    def history(self):
+        return self.core.history
 
     def change_project_id(self, project_id: str, move_files: bool = True) -> None:
-        if self.project_id == project_id:
-            return
-
-        if not path.exists(project_id):
-            if self.generated_project or move_files:
-                if path.exists(self.project_id):
-                    move(self.project_id, project_id)
-                else:
-                    mkdir(project_id)
-            else:
-                if path.exists(self.project_id):
-                    copytree(self.project_id, project_id)
-                else:
-                    mkdir(project_id)
-
-            self.generated_project = False
-            self.set_project_id(project_id)
-        else:
-            self.reset_ranking_parser()
-
-            self.generated_project = False
-            self.set_project_id(project_id)
-            self.load_history(project_id)
-
-    def file_in_project(self, filename: str, extension: str = "txt") -> str:
-        result = check_file_extension(filename, extension)
-        if result[:len(self.project_id)] != self.project_id:
-            result = f"{self.project_id}/{result}"
-
-        return result
+        self.core.change_project_id(project_id, move_files)
 
     def do_parse(self, text: str, write_history: bool = True) -> None:
         if text.strip() == "":
@@ -88,114 +38,68 @@ class Session(object):
         print(self._hl.highlight(text))
 
         try:
-            result = self._rp.parse(text)
+            self.core.do_parse(text, write_history)
         except ParsingError as e:
             print(STYLE_MAP["ERROR"], f"ERROR: {e}", STYLE_MAP["RESET"])
-            return
-
-        if result is not None:
-            self.history.append(text)
-            if write_history:
-                self.write_history()
-
-            if not self._rp.ranking_problem.is_solvable:
-                self.undo()
-
-                if write_history:
-                    self.write_history()
+        except UnsolvableModelError:
+            print(f"{STYLE_MAP['ERROR']}Undoing:{STYLE_MAP['RESET']}", self._hl.highlight(text))
 
     def write_history(self) -> None:
-        if not self.log_history:
-            return
-
-        try:
-            if not path.exists(self.project_id):
-                mkdir(self.project_id)
-
-            file_name = self.file_in_project("output", "txt")
-
-            export_lines_to_text(self.history, file_name)
-        except:
-            pass
+        self.core.write_history()
 
     def load_history(self, project_id: str) -> None:
-        file_name = f"{project_id}/output.txt"
-        lines = import_text_to_lines(file_name)
-
-        if len(lines) == 0:
-            print(f"Nothing to read from {file_name}")
-            return
-
-        self.history.clear()
-
-        for l in lines:
-            self.do_parse(l, write_history=False)
+        lines_read = self.core.load_history(project_id)
+        if lines_read == 0:
+            print(f"Nothing to read from {project_id}/output.txt")
 
     def import_items(self, file_name: str) -> None:
-        lines = import_text_to_lines(file_name)
-
-        if len(lines) == 0:
+        lines_read = self.core.import_items(file_name)
+        if lines_read == 0:
             print(f"Nothing to read from {file_name}")
-            return
-
-        for l in lines:
-            self.do_parse(f"+ [{l.strip()}]")
-
-        print("imported items")
+        else:
+            print("imported items")
 
     def export_items(self, file_name: str) -> None:
-        output_file_name = self.file_in_project(file_name, "txt")
-        export_lines_to_text(self._rp.items, output_file_name)
+        output_file_name = self.core.export_items(file_name)
         print(f"exported items to {output_file_name}")
 
     def do_tokenize(self, text: str) -> None:
-        result = self._rl.tokenize(text.strip())
+        result = self.core.do_tokenize(text)
         self.pp.pprint(result)
 
     def undo(self) -> None:
-        if len(self.history) > 0:
-            print(f"{STYLE_MAP['ERROR']}Undoing:{STYLE_MAP['RESET']}", self._hl.highlight(self.history[-1]))
-            self._rp.remove_last_constraint()
+        last_cmd = self.core.undo()
+        if last_cmd is not None:
+            print(f"{STYLE_MAP['ERROR']}Undoing:{STYLE_MAP['RESET']}", self._hl.highlight(last_cmd))
 
     def print_history(self) -> None:
-        for h in self.history:
+        for h in self.core.get_history():
             print(self._hl.highlight(h))
 
     def print_token_debug(self, s: str) -> None:
         self.do_tokenize(s.strip())
 
     def generate_graph(self, filename: str) -> None:
-        solutions = self.solve()
-        if len(solutions) == 0:
+        result = self.core.generate_graph(filename)
+        if result is None:
             print("No solutions to generate a graph from")
-            return
-
-        generate_viz_from_solutions(solutions, filename)
 
     def export_csv(self, filename: str) -> None:
-        solutions = self.solve()
-        if len(solutions) == 0:
+        result = self.core.export_csv(filename)
+        if result is None:
             print("No solutions to generate a graph from")
-            return
-
-        output_filename = self.file_in_project(filename, "csv")
-        export_csv(solutions, output_filename)
 
     def suggest_pair(self) -> None:
-        pair = None
-
         try:
-            pair = self._rp.ranking_problem.least_most_common_variable
+            pair = self.core.suggest_pair()
+            print(self._hl.highlight(f"[{pair[0]}] versus [{pair[1]}]"))
         except Exception as e:
             print("Couldn't suggest pair", e)
-            return
-
-        print(self._hl.highlight(f"[{pair[0]}] versus [{pair[1]}]"))
 
     def solve(self) -> list:
         result = list()
         try:
-            result = self._rp.solve()
+            result = self.core.solve()
         except IncompleteResultsError as e:
             print(f"{STYLE_MAP['ERROR']}{e.message}{Style.NORMAL}{STYLE_MAP['RESET']}")
             # result = e.results
@@ -205,12 +109,11 @@ class Session(object):
         return result
 
     def print_stats(self, filename: str = None) -> None:
-        solutions = self.solve()
-        if len(solutions) == 0:
+        result = self.core.get_stats(filename)
+        if result is None:
             print("No solutions to generate a stats from")
             return
 
-        result = stats_from_solutions(solutions)
         print(Style.RESET_ALL)
 
         for item in result:
@@ -218,12 +121,6 @@ class Session(object):
             printout(result[item], item)
 
         print(Style.RESET_ALL)
-
-        if filename is not None:
-            lines = list()
-            for key in result:
-                lines.append(f"{key}={result[key]}")
-            export_lines_to_text(lines, self.file_in_project(filename))
 
     def display_commands(self) -> None:
         for key in commands:
@@ -280,12 +177,12 @@ class Session(object):
                 print("Need to specify a filename")
         elif text_split[0] in ["graph", "diagram"]:
             if len(text_split) > 1:
-                self.generate_graph(f"{self.project_id}/{text_split[1]}")
+                self.generate_graph(f"{self.core.project_id}/{text_split[1]}")
             else:
                 print("Need to specify a filename")
         elif text_split[0] in ["csv"]:
             if len(text_split) > 1:
-                self.export_csv(f"{self.project_id}/{text_split[1]}")
+                self.export_csv(f"{self.core.project_id}/{text_split[1]}")
             else:
                 print("Need to specify a filename")
         elif text_split[0] == "~":
@@ -308,12 +205,12 @@ class Session(object):
     def start(self) -> None:
 
         prompt_session = PromptSession()
-        word_completer = WordCompleter(self._rp.items, ignore_case=True)
+        word_completer = WordCompleter(self.core.get_items(), ignore_case=True)
 
         while True:
             prompt = "RankParser>"
-            if not self.generated_project:
-                prompt = f"{self.project_id}>"
+            if not self.core.generated_project:
+                prompt = f"{self.core.project_id}>"
 
             text = prompt_session.prompt(
                 prompt, auto_suggest=AutoSuggestFromHistory(), completer=word_completer, complete_in_thread=True
@@ -330,7 +227,7 @@ class Session(object):
                     print(f"{STYLE_MAP['ERROR']}Error reading input: {text}")
                     print(f"{e}{Style.NORMAL}")
                 else:
-                    word_completer.words = self._rp.items
+                    word_completer.words = self.core.get_items()
 
 
 if __name__ == "__main__":
