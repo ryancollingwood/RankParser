@@ -12,7 +12,7 @@ def test_can_create_session():
 
 def test_properties_set_on_create_session():
     session = Session()
-    assert(isinstance(session.history, List))
+    assert(isinstance(session.history, list))
     assert(len(session.history) == 0)
     assert(isinstance(session.project_id, str))
 
