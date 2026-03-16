@@ -175,10 +175,12 @@ class RankingNetwork(object):
 
         for i in range(permutations):
             i_result = list()
+            i_result_set = set()
             for path in square_result:
                 item = path[i]
-                if item not in i_result:
+                if item not in i_result_set:
                     i_result.append(item)
+                    i_result_set.add(item)
             result.append(list(i_result))
 
         return result
