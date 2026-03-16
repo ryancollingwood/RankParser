@@ -3,9 +3,8 @@ from os import mkdir
 from shutil import move, copytree
 from os import path
 
-from solver import RankingParser, RankingLexer
-from solver import IncompleteResultsError, UnsolvableModelError, ParsingError
-from graph import generate_viz_from_solutions, export_csv, stats_from_solutions, export_highlighted_path
+from solver import RankingParser, RankingLexer, UnsolvableModelError
+from graph import generate_viz_from_solutions, export_csv, stats_from_solutions
 from input_output import export_lines_to_text, import_text_to_lines, check_file_extension
 
 class RankParserCore(object):
