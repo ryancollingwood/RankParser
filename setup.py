@@ -33,21 +33,21 @@ def extract_zip(file_name, destination_folder):
 def where_dot():
     result = None
     try:
-        result = subprocess.check_output("where dot.exe", shell=True)
-    except subprocess.CalledProcessError:
+        result = subprocess.check_output(["where", "dot.exe"])
+    except (subprocess.CalledProcessError, FileNotFoundError):
         pass
 
     if result is None:
         try:
-            result = subprocess.check_output("whereis dot.exe", shell=True)
-        except subprocess.CalledProcessError:
+            result = subprocess.check_output(["whereis", "dot.exe"])
+        except (subprocess.CalledProcessError, FileNotFoundError):
             pass
 
-    if result is None:
+    if result is None or not result.strip():
         return None
 
-    result = result.decode("utf-8").split("\r\n")[0]
-    result = os.path.split(result)[0]
+    result = result.decode("utf-8").splitlines()[0].strip()
+    result = os.path.dirname(result)
 
     return result
 
