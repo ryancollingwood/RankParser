@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RankParser</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #1a1d2e;
+      border-bottom: 1px solid #2d3148;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #7c3aed;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: #1a1d2e;
+      border: 1px solid #2d3148;
+      border-radius: 10px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .panel h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #7c3aed;
+    }
+
+    /* Input area */
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 6px;
+      padding: 0.6rem 0.9rem;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      font-family: 'Courier New', monospace;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus { border-color: #7c3aed; }
+    input[type="text"]::placeholder { color: #475569; }
+
+    button {
+      background: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem 1.1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    button:hover { background: #6d28d9; }
+    button:active { background: #5b21b6; }
+
+    button.secondary {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+    }
+
+    button.secondary:hover { background: #334155; color: #e2e8f0; }
+
+    button.danger {
+      background: #7f1d1d;
+      color: #fca5a5;
+      border: 1px solid #991b1b;
+    }
+
+    button.danger:hover { background: #991b1b; }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Syntax help */
+    .syntax-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+    }
+
+    .syntax-item {
+      background: #0f1117;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .syntax-item:hover { border-color: #7c3aed; }
+
+    .syntax-item code {
+      display: block;
+      font-size: 0.78rem;
+      color: #a78bfa;
+      font-family: 'Courier New', monospace;
+    }
+
+    .syntax-item span {
+      font-size: 0.72rem;
+      color: #64748b;
+    }
+
+    /* History */
+    .history-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .history-list li {
+      background: #0f1117;
+      border: 1px solid #1e293b;
+      border-radius: 5px;
+      padding: 0.4rem 0.75rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: #a78bfa;
+    }
+
+    /* Items */
+    .items-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .item-badge {
+      background: #1e1b4b;
+      border: 1px solid #4c1d95;
+      color: #c4b5fd;
+      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.82rem;
+    }
+
+    /* Solutions */
+    .solutions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+
+    .solution-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #0f1117;
+      border: 1px solid #1e293b;
+      border-radius: 5px;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.82rem;
+    }
+
+    .solution-num {
+      color: #475569;
+      font-size: 0.72rem;
+      min-width: 1.5rem;
+    }
+
+    .solution-item {
+      background: #14532d;
+      border: 1px solid #166534;
+      color: #86efac;
+      border-radius: 4px;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.78rem;
+    }
+
+    .sep {
+      color: #334155;
+      font-size: 0.72rem;
+    }
+
+    .count-badge {
+      font-size: 0.78rem;
+      background: #312e81;
+      color: #a5b4fc;
+      border-radius: 20px;
+      padding: 0.15rem 0.6rem;
+      margin-left: auto;
+    }
+
+    /* Error / info */
+    .message {
+      padding: 0.6rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .message.error { background: #450a0a; border: 1px solid #991b1b; color: #fca5a5; display: block; }
+    .message.info  { background: #0c2a12; border: 1px solid #166534; color: #86efac; display: block; }
+
+    .empty { color: #475569; font-size: 0.85rem; font-style: italic; }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid #7c3aed;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>RankParser</h1>
+    <p>Determine orderings from natural language constraints</p>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- Left column -->
+  <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+    <!-- Input -->
+    <div class="panel">
+      <h2>Enter Constraint</h2>
+      <div class="input-row">
+        <input type="text" id="inputText" placeholder="e.g. Alice before Bob" autocomplete="off" />
+        <button onclick="parseInput()">Parse</button>
+      </div>
+      <div id="message" class="message"></div>
+      <div class="actions">
+        <button class="secondary" onclick="undoLast()">&#8592; Undo</button>
+        <button class="danger" onclick="resetAll()">Reset</button>
+        <button class="secondary" onclick="loadChallenge('programmer')">Load: Programmer Riddle</button>
+        <button class="secondary" onclick="loadChallenge('tea')">Load: Tea Steps</button>
+      </div>
+    </div>
+
+    <!-- Syntax guide -->
+    <div class="panel">
+      <h2>Syntax Guide <span style="color:#475569;font-weight:400;text-transform:none;font-size:0.8rem;">(click to insert)</span></h2>
+      <div class="syntax-grid">
+        <div class="syntax-item" onclick="insert('+ [Alice]')">
+          <code>+ [Alice]</code>
+          <span>Add an item</span>
+        </div>
+        <div class="syntax-item" onclick="insert('Alice before Bob')">
+          <code>Alice before Bob</code>
+          <span>A comes before B</span>
+        </div>
+        <div class="syntax-item" onclick="insert('Alice after Bob')">
+          <code>Alice after Bob</code>
+          <span>A comes after B</span>
+        </div>
+        <div class="syntax-item" onclick="insert('Alice not first')">
+          <code>Alice not first</code>
+          <span>A is not first</span>
+        </div>
+        <div class="syntax-item" onclick="insert('Alice not last')">
+          <code>Alice not last</code>
+          <span>A is not last</span>
+        </div>
+        <div class="syntax-item" onclick="insert('Alice first')">
+          <code>Alice first</code>
+          <span>A must be first</span>
+        </div>
+        <div class="syntax-item" onclick="insert('Alice last')">
+          <code>Alice last</code>
+          <span>A must be last</span>
+        </div>
+        <div class="syntax-item" onclick="insert('Alice near Bob')">
+          <code>Alice near Bob</code>
+          <span>A and B are adjacent</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="panel">
+      <h2>Items Being Ranked</h2>
+      <div id="itemsList" class="items-list">
+        <span class="empty">No items yet. Add items with <code style="color:#a78bfa">+ [Name]</code></span>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="panel">
+      <h2>Constraint History</h2>
+      <ul id="historyList" class="history-list">
+        <li style="color:#475569;font-style:italic;list-style:none;">No constraints entered yet.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Right column: Solutions -->
+  <div class="panel">
+    <h2>
+      Solutions
+      <span id="solutionCount" class="count-badge" style="display:none"></span>
+    </h2>
+    <div id="solutionsList" class="solutions-list">
+      <span class="empty">Solutions will appear here once items and constraints are added.</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const inputEl = document.getElementById('inputText');
+  const msgEl = document.getElementById('message');
+
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') parseInput();
+  });
+
+  function showMessage(text, type) {
+    msgEl.textContent = text;
+    msgEl.className = 'message ' + type;
+    if (type === 'info') setTimeout(() => { msgEl.className = 'message'; }, 2500);
+  }
+
+  function clearMessage() {
+    msgEl.className = 'message';
+  }
+
+  function insert(text) {
+    inputEl.value = text;
+    inputEl.focus();
+  }
+
+  async function apiFetch(url, options = {}) {
+    const resp = await fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    return resp.json();
+  }
+
+  function renderState(state) {
+    // Items
+    const itemsEl = document.getElementById('itemsList');
+    if (state.items && state.items.length > 0) {
+      itemsEl.innerHTML = state.items.map(i =>
+        `<span class="item-badge">${escHtml(i)}</span>`
+      ).join('');
+    } else {
+      itemsEl.innerHTML = '<span class="empty">No items yet. Add items with <code style="color:#a78bfa">+ [Name]</code></span>';
+    }
+
+    // History
+    const histEl = document.getElementById('historyList');
+    if (state.history && state.history.length > 0) {
+      histEl.innerHTML = state.history.map(h =>
+        `<li>${escHtml(h)}</li>`
+      ).join('');
+      histEl.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      histEl.innerHTML = '<li style="color:#475569;font-style:italic;list-style:none;">No constraints entered yet.</li>';
+    }
+
+    // Solutions
+    const solEl = document.getElementById('solutionsList');
+    const countEl = document.getElementById('solutionCount');
+    if (state.solutions && state.solutions.length > 0) {
+      countEl.textContent = state.solutions.length + ' solution' + (state.solutions.length !== 1 ? 's' : '');
+      countEl.style.display = 'inline';
+      solEl.innerHTML = state.solutions.map((sol, i) => {
+        const items = sol.map(item =>
+          `<span class="solution-item">${escHtml(item)}</span>`
+        ).join('<span class="sep">›</span>');
+        return `<div class="solution-row"><span class="solution-num">${i + 1}.</span>${items}</div>`;
+      }).join('');
+    } else {
+      countEl.style.display = 'none';
+      solEl.innerHTML = '<span class="empty">Solutions will appear here once items and constraints are added.</span>';
+    }
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  async function parseInput() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+    clearMessage();
+    const data = await apiFetch('/api/parse', { method: 'POST', body: JSON.stringify({ text }) });
+    if (data.error) {
+      showMessage(data.error, 'error');
+    } else {
+      inputEl.value = '';
+      renderState(data);
+    }
+  }
+
+  async function undoLast() {
+    clearMessage();
+    const data = await apiFetch('/api/undo', { method: 'POST' });
+    if (data.removed) showMessage(`Removed: "${data.removed}"`, 'info');
+    renderState(data);
+  }
+
+  async function resetAll() {
+    if (!confirm('Reset all items and constraints?')) return;
+    clearMessage();
+    const data = await apiFetch('/api/reset', { method: 'POST' });
+    renderState(data);
+  }
+
+  async function loadChallenge(name) {
+    clearMessage();
+    const data = await apiFetch('/api/load_challenge', { method: 'POST', body: JSON.stringify({ challenge: name }) });
+    renderState(data);
+    if (data.errors) showMessage('Loaded with some errors: ' + data.errors.join('; '), 'error');
+    else showMessage('Loaded: ' + name + ' challenge', 'info');
+  }
+
+  // Initial state load
+  apiFetch('/api/state').then(renderState);
+</script>
+</body>
+</html>
