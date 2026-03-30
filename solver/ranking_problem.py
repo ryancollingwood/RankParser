@@ -213,7 +213,7 @@ class RankingProblem:
         if self._items != tuple():
             raise ValueError("Items Already Set")
 
-        cleaned_items = [x for x in [clean_variable(item) for item in items] if x not in POSITIONS]
+        cleaned_items = [x for x in (clean_variable(item) for item in items) if x not in POSITIONS]
 
         self._items = tuple(cleaned_items)
         self.__add_variables(cleaned_items)
