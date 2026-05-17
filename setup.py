@@ -1,7 +1,6 @@
 import os
-import subprocess
+import shutil
 from urllib import request
-from zipfile import ZipFile
 
 ENV_VARIABLE_NAME = "GRAPHVIZ_DOT"
 WIN_GRAPHVIZ_URL = "https://graphviz.gitlab.io/_pages/Download/windows/graphviz-2.38.zip"
@@ -21,48 +20,29 @@ def download_graphviz(url, destination_file):
     print("Download complete")
 
 
-def extract_zip(file_name, destination_folder):
-    print(f"Extracting {file_name} to {destination_folder}")
-    with ZipFile(file_name, 'r') as zip_ref:
-        zip_ref.extractall(destination_folder)
-
-    os.remove(file_name)
-    print("Extraction complete")
-
-
 def where_dot():
-    result = None
-    try:
-        result = subprocess.check_output(["where", "dot.exe"])
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        pass
-
-    if result is None:
-        try:
-            result = subprocess.check_output(["whereis", "dot.exe"])
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            pass
-
-    if result is None or not result.strip():
-        return None
-
-    result = result.decode("utf-8").splitlines()[0].strip()
-    result = os.path.dirname(result)
-
-    return result
+    """Locate the Graphviz dot executable."""
+    dot_path = shutil.which("dot")
+    if dot_path:
+        return os.path.dirname(dot_path)
+    return None
 
 
-# os.environ["PATH"] += os.pathsep + path
+if __name__ == "__main__":
+    install_path = where_dot()
 
-install_path = where_dot()
+    if install_path is None:
+        print(f"Graphviz not found on path - will be downloaded to: {INSTALL_TO_DIRECTORY}")
+        download_graphviz(WIN_GRAPHVIZ_URL, DESTINATION_FILE)
 
-if install_path is None:
-    print(f"Graphviz not found on path - will be downloaded to: {INSTALL_TO_DIRECTORY}")
-    download_graphviz(WIN_GRAPHVIZ_URL, DESTINATION_FILE)
-    extract_zip(DESTINATION_FILE, INSTALL_TO_DIRECTORY)
-    print("Setting Environment Variable")
-    os.environ["PATH"] += os.pathsep + DOT_PATH
-else:
-    if install_path not in os.environ["PATH"]:
+        print(f"Extracting {DESTINATION_FILE} to {INSTALL_TO_DIRECTORY}")
+        shutil.unpack_archive(DESTINATION_FILE, INSTALL_TO_DIRECTORY)
+        os.remove(DESTINATION_FILE)
+        print("Extraction complete")
+
         print("Setting Environment Variable")
-        os.environ["PATH"] += os.pathsep + install_path
+        os.environ["PATH"] += os.pathsep + DOT_PATH
+    else:
+        if install_path not in os.environ.get("PATH", ""):
+            print("Setting Environment Variable")
+            os.environ["PATH"] += os.pathsep + install_path
