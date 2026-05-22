@@ -185,7 +185,12 @@ class RankingNetwork(object):
 
         return result
 
-    def to_dot_viz(self, filename: str, max_pen_width: int = 12):
+    def to_dot_viz(
+            self,
+            filename: str,
+            max_pen_width: int = 12,
+            only_show_highlighted_paths: bool = False
+    ):
         highlight_paths = self.distill_highlight_path()
 
         return digraph_to_dot_viz(
@@ -193,6 +198,7 @@ class RankingNetwork(object):
             highlight_paths = highlight_paths,
             output_dot_viz = filename,
             max_pen_width = max_pen_width,
+            only_show_highlighted_paths = only_show_highlighted_paths,
         )
 
     def to_csv(self, output_file: str):

@@ -8,6 +8,7 @@ def generate_viz_from_statements(
         statements: List[str],
         output_dot_viz: str = None,
         max_pen_width = 12,
+        only_show_highlighted_paths: bool = False,
 ):
     rp = RankingParser()
     rp.build()
@@ -20,14 +21,16 @@ def generate_viz_from_statements(
     return generate_viz_from_solutions(
         solutions,
         output_dot_viz,
-        max_pen_width = max_pen_width
+        max_pen_width = max_pen_width,
+        only_show_highlighted_paths = only_show_highlighted_paths,
     )
 
 
 def generate_viz_from_solutions(
         solutions: List[List[str]],
         output_dot_viz: str,
-        max_pen_width = 12
+        max_pen_width = 12,
+        only_show_highlighted_paths: bool = False,
 ):
     rg = RankingGraph(solutions)
     rn = RankingNetwork()
@@ -35,6 +38,7 @@ def generate_viz_from_solutions(
 
     return rn.to_dot_viz(
         output_dot_viz,
-        max_pen_width = max_pen_width
+        max_pen_width = max_pen_width,
+        only_show_highlighted_paths = only_show_highlighted_paths,
     )
 
