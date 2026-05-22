@@ -12,9 +12,25 @@ def digraph_to_dot_viz(
         highlight_color = "red",
         output_dot_viz = None,
         max_pen_width = 12,
+        only_show_highlighted_paths: bool = False,
 ):
-    # TODO have an option to only show the highlight path
     dg = di_graph.copy()
+
+    if only_show_highlighted_paths and highlight_paths:
+        nodes_to_keep = set()
+        edges_to_keep = set()
+        for path in highlight_paths:
+            for i in range(len(path)):
+                nodes_to_keep.add(path[i])
+                if i < len(path) - 1:
+                    edges_to_keep.add((path[i], path[i+1]))
+
+        nodes_to_remove = [n for n in dg.nodes() if n not in nodes_to_keep]
+        dg.remove_nodes_from(nodes_to_remove)
+
+        edges_to_remove = [e for e in dg.edges() if (e[0], e[1]) not in edges_to_keep]
+        dg.remove_edges_from(edges_to_remove)
+
     max_weight = 0
 
     edges = dg.edges(data=True)
@@ -50,11 +66,12 @@ def digraph_to_dot_viz(
         data["fillcolor"] = color_gradient[int(data["position"])].hex_l
 
     edges = dg.edges(data=True)
-    for path in highlight_paths:
-        for i in range(len(path) - 1):
-            matching_steps = [x for x in edges if x[0] == path[i] and x[1] == path[i + 1]]
-            for match_edge in matching_steps:
-                match_edge[2]["color"] = highlight_color
+    if highlight_paths:
+        for path in highlight_paths:
+            for i in range(len(path) - 1):
+                matching_steps = [x for x in edges if x[0] == path[i] and x[1] == path[i + 1]]
+                for match_edge in matching_steps:
+                    match_edge[2]["color"] = highlight_color
 
     a_graph = nx_pydot.to_pydot(dg)
 
